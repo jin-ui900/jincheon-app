@@ -30,8 +30,8 @@ app = FastAPI(
 # CORS 설정 (프론트엔드에서 API 호출 허용)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 배포 시 실제 도메인으로 교체
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
