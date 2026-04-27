@@ -679,7 +679,7 @@ function dtog(el) { el.classList.toggle('on'); }
 document.querySelectorAll('.hd-cat').forEach(c => {
   c.onclick = () => { document.querySelectorAll('.hd-cat').forEach(x => x.classList.remove('on')); c.classList.add('on'); };
 });
-
+</script>
 
 <style>
 /* ── 내 정보 ── */
@@ -877,3 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadMyInfo();
 });
 </script>
+
+<script src="api.js"></script>
+</body>
+</html>
