@@ -6,6 +6,7 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_db
@@ -27,7 +28,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS 설정 (프론트엔드에서 API 호출 허용)
+# CORS 설정
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -41,13 +42,21 @@ app.include_router(users_router)
 app.include_router(products_router)
 app.include_router(reviews_router)
 
-# 정적 파일 (업로드 이미지)
-static_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "static")
+# 프론트엔드 정적 파일 서빙
+frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+static_dir   = os.path.join(frontend_dir, "static")
+
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+if os.path.exists(frontend_dir):
+    app.mount("/app", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+
 @app.get("/")
 async def root():
+    index_path = os.path.join(frontend_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return {"message": "진천 자급자족 API 정상 작동 중 🌿"}
 
 @app.get("/health")
