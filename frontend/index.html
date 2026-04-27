@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>진천 자급자족</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width: 420px; margin: 0 auto; color: #111; }
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── 헤더 ── */
+.hd { background: #e8380d; padding: 10px 14px 8px; position: sticky; top: 0; z-index: 100; }
+.hd-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.hd-logo { color: #fff; font-size: 18px; font-weight: 700; flex-shrink: 0; }
+.hd-search { flex: 1; background: #fff; border-radius: 6px; display: flex; align-items: center; overflow: hidden; }
+.hd-search input { flex: 1; border: none; outline: none; padding: 8px 10px; font-size: 14px; font-family: inherit; }
+.hd-search button { background: #c72d08; border: none; color: #fff; padding: 0 14px; height: 36px; font-size: 13px; cursor: pointer; font-family: inherit; }
+.hd-cats { display: flex; gap: 0; overflow-x: auto; margin: 0 -14px; padding: 0 14px; }
+.hd-cats::-webkit-scrollbar { display: none; }
+.hd-cat { color: rgba(255,255,255,0.75); font-size: 12px; padding: 4px 10px; white-space: nowrap; cursor: pointer; border-bottom: 2px solid transparent; }
+.hd-cat.on { color: #fff; border-bottom-color: #fff; font-weight: 700; }
+
+/* ── 로그인 / 회원가입 ── */
+.auth-wrap { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 40px 24px; background: #fff; }
+.auth-logo { text-align: center; margin-bottom: 36px; }
+.auth-logo-text { font-size: 26px; font-weight: 700; color: #e8380d; }
+.auth-logo-sub { font-size: 13px; color: #bbb; margin-top: 4px; }
+.auth-field { margin-bottom: 14px; }
+.auth-label { font-size: 12px; color: #999; margin-bottom: 5px; display: block; }
+.auth-input { width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 13px 14px; font-size: 15px; font-family: inherit; outline: none; color: #111; background: #fafafa; }
+.auth-input:focus { border-color: #e8380d; background: #fff; }
+.auth-btn { width: 100%; background: #e8380d; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 6px; }
+.auth-btn:active { background: #c72d08; }
+.auth-btn-outline { width: 100%; background: #fff; color: #e8380d; border: 1.5px solid #e8380d; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 10px; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.auth-divider-line { flex: 1; height: 1px; background: #eee; }
+.auth-divider-text { font-size: 12px; color: #bbb; }
+.auth-social { display: flex; flex-direction: column; gap: 10px; }
+.auth-social-btn { width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 13px; font-size: 14px; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: #fff; color: #333; }
+.auth-social-btn.kakao { background: #FEE500; border-color: #FEE500; color: #111; }
+.auth-social-btn.naver { background: #03C75A; border-color: #03C75A; color: #fff; }
+.auth-switch { text-align: center; margin-top: 24px; font-size: 13px; color: #888; }
+.auth-switch span { color: #e8380d; font-weight: 700; cursor: pointer; }
+.auth-agree { margin-top: 14px; font-size: 12px; color: #aaa; line-height: 1.7; }
+.auth-agree a { color: #e8380d; text-decoration: none; }
+.auth-error { background: #fff0f0; border: 1px solid #ffd0d0; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #e8380d; margin-bottom: 14px; display: none; }
+.auth-error.show { display: block; }
+
+/* ── 필터 바 ── */
+.fbar { background: #fff; border-bottom: 1px solid #eee; padding: 8px 14px; display: flex; gap: 6px; overflow-x: auto; }
+.fbar::-webkit-scrollbar { display: none; }
+.fpill { border: 1px solid #ddd; border-radius: 4px; padding: 5px 10px; font-size: 12px; color: #555; background: #fff; cursor: pointer; white-space: nowrap; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+.fpill.on { border-color: #e8380d; color: #e8380d; background: #fff8f7; }
+.fpill svg { width: 10px; height: 10px; flex-shrink: 0; }
+
+/* ── 메인 그리드 ── */
+.section-head { padding: 14px 14px 8px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f0f0f0; }
+.section-head span { font-size: 15px; font-weight: 700; }
+.section-head a { font-size: 12px; color: #888; cursor: pointer; text-decoration: none; }
+
+.ad-banner { margin: 10px 14px; background: #fff3cc; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ffe57a; }
+.ad-banner-text { font-size: 14px; font-weight: 700; color: #7a5800; }
+.ad-banner-sub { font-size: 11px; color: #a07000; margin-top: 2px; }
+.ad-banner-btn { background: #e8a000; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #eee; }
+.gcard { background: #fff; cursor: pointer; }
+.gcard-img { width: 100%; aspect-ratio: 1; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 56px; position: relative; overflow: hidden; }
+.gcard-img .ribbon { position: absolute; top: 0; left: 0; background: #e8380d; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; }
+.gcard-img .ribbon.used { background: #3d9900; }
+.gcard-img .ribbon.ad { background: transparent; color: #bbb; border: 1px solid #ddd; font-size: 10px; font-weight: 400; top: 6px; left: auto; right: 6px; padding: 2px 6px; border-radius: 3px; }
+.gcard-info { padding: 10px 10px 14px; }
+.gcard-name { font-size: 13px; color: #222; line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gcard-price { font-size: 16px; font-weight: 700; color: #111; }
+.gcard-original { font-size: 11px; color: #bbb; text-decoration: line-through; margin-left: 4px; font-weight: 400; }
+.gcard-discount { font-size: 13px; color: #e8380d; font-weight: 700; margin-left: 4px; }
+.gcard-meta { font-size: 11px; color: #bbb; margin-top: 5px; }
+.gcard-meta span { margin-right: 6px; }
+
+.section-divider { height: 10px; background: #f0f0f0; }
+
+/* ── 하단 네비 ── */
+.bnav { height: 56px; border-top: 1px solid #eee; display: flex; background: #fff; position: sticky; bottom: 0; }
+.bn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; font-size: 10px; color: #bbb; }
+.bn.on { color: #e8380d; }
+.bn-ic { font-size: 22px; }
+.sell-fab { position: fixed; bottom: 64px; right: calc(50% - 210px + 14px); background: #e8380d; color: #fff; border: none; border-radius: 24px; padding: 12px 18px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 2px 12px rgba(232,56,13,0.4); }
+
+/* ── 상세 ── */
+.det-bar { background: #fff; height: 50px; display: flex; align-items: center; padding: 0 14px; gap: 12px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 50; }
+.det-back { font-size: 22px; cursor: pointer; background: none; border: none; font-family: inherit; }
+.det-imgs { background: #f5f5f5; height: 340px; display: flex; align-items: center; justify-content: center; font-size: 110px; position: relative; }
+.det-counter { position: absolute; bottom: 12px; right: 14px; background: rgba(0,0,0,0.45); color: #fff; font-size: 12px; padding: 3px 10px; border-radius: 12px; }
+.det-main { background: #fff; padding: 16px 14px; }
+.det-badges { display: flex; gap: 6px; margin-bottom: 8px; }
+.det-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 3px; }
+.det-badge-new { background: #e8f4ff; color: #0055aa; }
+.det-badge-used { background: #eaf5e0; color: #2d7a00; }
+.det-name { font-size: 17px; font-weight: 700; line-height: 1.45; margin-bottom: 10px; }
+.det-price-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+.det-discount { font-size: 22px; font-weight: 700; color: #e8380d; }
+.det-price { font-size: 22px; font-weight: 700; }
+.det-original { font-size: 14px; color: #bbb; text-decoration: line-through; }
+.det-meta { font-size: 12px; color: #bbb; display: flex; gap: 12px; margin-top: 4px; }
+.det-divider { height: 8px; background: #f5f5f5; }
+.det-seller { background: #fff; padding: 14px; display: flex; align-items: center; gap: 12px; }
+.det-avatar { width: 40px; height: 40px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.det-sname { font-size: 14px; font-weight: 700; }
+.det-ssub { font-size: 12px; color: #bbb; margin-top: 2px; }
+.det-desc { background: #fff; padding: 16px 14px; font-size: 14px; color: #333; line-height: 1.9; }
+.det-spec { background: #fff; padding: 14px; }
+.det-spec-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
+.det-spec-row:last-child { border: none; }
+.det-spec-row span:first-child { color: #999; }
+.det-foot { background: #fff; border-top: 1px solid #eee; padding: 10px 14px; display: flex; gap: 8px; align-items: center; position: sticky; bottom: 0; }
+.det-heart { font-size: 26px; cursor: pointer; }
+.det-chat { flex: 1; border: 1.5px solid #e8380d; color: #e8380d; background: #fff; border-radius: 6px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.det-buy { flex: 1.5; background: #e8380d; color: #fff; border: none; border-radius: 6px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+/* ── 판매 등록 ── */
+.reg-bar { background: #fff; height: 50px; display: flex; align-items: center; padding: 0 14px; gap: 12px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 50; }
+.reg-title { font-size: 16px; font-weight: 700; flex: 1; }
+.reg-save { font-size: 13px; color: #888; background: none; border: none; cursor: pointer; font-family: inherit; }
+.reg-body { padding-bottom: 80px; background: #f7f7f7; }
+
+.reg-photo { background: #fff; padding: 16px 14px; margin-bottom: 8px; }
+.reg-photo-label { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.photo-scroll { display: flex; gap: 8px; overflow-x: auto; }
+.photo-scroll::-webkit-scrollbar { display: none; }
+.photo-add { width: 80px; height: 80px; border: 1.5px dashed #ddd; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; background: #fafafa; }
+.photo-add-ic { font-size: 24px; color: #ccc; }
+.photo-add-txt { font-size: 10px; color: #ccc; margin-top: 2px; }
+
+.reg-card { background: #fff; margin-bottom: 8px; }
+.reg-row { padding: 14px; border-bottom: 1px solid #f5f5f5; }
+.reg-row:last-child { border: none; }
+.reg-label { font-size: 12px; color: #999; margin-bottom: 6px; }
+.reg-label .req { color: #e8380d; }
+.reg-input { width: 100%; border: none; outline: none; font-size: 15px; color: #111; font-family: inherit; background: transparent; }
+.reg-textarea { width: 100%; border: none; outline: none; font-size: 15px; color: #111; font-family: inherit; resize: none; height: 100px; line-height: 1.7; background: transparent; }
+.reg-select { width: 100%; border: none; outline: none; font-size: 15px; color: #111; font-family: inherit; background: transparent; cursor: pointer; }
+.reg-char { font-size: 11px; color: #ccc; text-align: right; margin-top: 6px; }
+.reg-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.reg-chip { padding: 7px 14px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; color: #666; cursor: pointer; font-family: inherit; background: #fff; }
+.reg-chip.on { border-color: #e8380d; color: #e8380d; background: #fff8f7; font-weight: 700; }
+.price-wrap { display: flex; align-items: baseline; gap: 6px; }
+.price-wrap .reg-input { font-size: 20px; font-weight: 700; }
+.price-wrap-unit { font-size: 15px; color: #888; }
+.price-opts { display: flex; gap: 16px; margin-top: 10px; font-size: 13px; color: #555; }
+.price-opts label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.price-opts input { accent-color: #e8380d; }
+
+.reg-foot { background: #fff; border-top: 1px solid #eee; padding: 10px 14px; position: sticky; bottom: 0; }
+.reg-submit { width: 100%; background: #e8380d; color: #fff; border: none; border-radius: 6px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+/* ── 필터 화면 ── */
+.fil-bar { background: #e8380d; padding: 10px 14px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; }
+.fil-back { color: #fff; font-size: 22px; cursor: pointer; background: none; border: none; font-family: inherit; }
+.fil-search { flex: 1; background: #fff; border-radius: 6px; display: flex; overflow: hidden; }
+.fil-search input { flex: 1; border: none; outline: none; padding: 8px 10px; font-size: 14px; font-family: inherit; }
+.fil-body { background: #f7f7f7; }
+.fil-section { background: #fff; margin-bottom: 8px; padding: 16px 14px; }
+.fil-section-title { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 12px; }
+.fil-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.fil-chip { padding: 7px 14px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; color: #666; cursor: pointer; font-family: inherit; background: #fff; }
+.fil-chip.on { border-color: #e8380d; color: #e8380d; background: #fff8f7; font-weight: 700; }
+.price-inputs { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.price-inputs input { flex: 1; border: 1px solid #ddd; border-radius: 4px; padding: 8px 10px; font-size: 14px; font-family: inherit; outline: none; color: #111; }
+.price-inputs input:focus { border-color: #e8380d; }
+.price-inputs span { color: #bbb; font-size: 13px; flex-shrink: 0; }
+.fil-foot { background: #fff; border-top: 1px solid #eee; padding: 10px 14px; display: flex; gap: 8px; position: sticky; bottom: 0; }
+.fil-reset { flex: 1; padding: 13px; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 14px; color: #666; cursor: pointer; font-family: inherit; }
+.fil-apply { flex: 2; padding: 13px; border: none; border-radius: 6px; background: #e8380d; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+</style>
+</head>
+<body>
+
+<!-- ── 로그인 ── -->
+<div id="s-login" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-text">진천 자급자족</div>
+      <div class="auth-logo-sub">진천군 주민 전용 마켓</div>
+    </div>
+    <div class="auth-error" id="login-error">이메일 또는 비밀번호를 확인해주세요.</div>
+    <div class="auth-field">
+      <label class="auth-label">이메일</label>
+      <input class="auth-input" type="email" id="login-email" placeholder="example@email.com">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">비밀번호</label>
+      <input class="auth-input" type="password" id="login-pw" placeholder="비밀번호 입력">
+    </div>
+    <button class="auth-btn" onclick="doLogin()">로그인</button>
+    <button class="auth-btn-outline" onclick="show('s-signup')">회원가입</button>
+    <div class="auth-divider">
+      <div class="auth-divider-line"></div>
+      <div class="auth-divider-text">또는 소셜 로그인</div>
+      <div class="auth-divider-line"></div>
+    </div>
+    <div class="auth-social">
+      <button class="auth-social-btn kakao" onclick="socialLogin('카카오')">카카오로 시작하기</button>
+      <button class="auth-social-btn naver" onclick="socialLogin('네이버')">네이버로 시작하기</button>
+    </div>
+    <div class="auth-switch">계정이 없으신가요? <span onclick="show('s-signup')">회원가입</span></div>
+  </div>
+</div>
+
+<!-- ── 회원가입 ── -->
+<div id="s-signup" class="screen">
+  <div class="auth-wrap" style="justify-content:flex-start;padding-top:30px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <button onclick="show('s-login')" style="font-size:22px;background:none;border:none;cursor:pointer;color:#111">←</button>
+      <div style="font-size:18px;font-weight:700">회원가입</div>
+    </div>
+    <div class="auth-error" id="signup-error">모든 항목을 입력해주세요.</div>
+    <div class="auth-field">
+      <label class="auth-label">이름</label>
+      <input class="auth-input" type="text" id="signup-name" placeholder="이름 입력">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">이메일</label>
+      <input class="auth-input" type="email" id="signup-email" placeholder="example@email.com">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">비밀번호</label>
+      <input class="auth-input" type="password" id="signup-pw" placeholder="8자 이상 입력">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">비밀번호 확인</label>
+      <input class="auth-input" type="password" id="signup-pw2" placeholder="비밀번호 재입력">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">지역</label>
+      <select class="auth-input" id="signup-region" style="cursor:pointer">
+        <option value="">거주 지역 선택</option>
+        <option>진천읍</option><option>덕산읍</option><option>광혜원면</option>
+        <option>초평면</option><option>이월면</option><option>문백면</option><option>백곡면</option>
+      </select>
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">휴대폰 번호</label>
+      <div style="display:flex;gap:8px">
+        <input class="auth-input" type="tel" id="signup-phone" placeholder="010-0000-0000" style="flex:1">
+        <button onclick="sendVerify()" style="background:#e8380d;color:#fff;border:none;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">인증</button>
+      </div>
+    </div>
+    <div class="auth-agree">가입하면 <a href="#" style="color:#e8380d">이용약관</a> 및 <a href="#" style="color:#e8380d">개인정보처리방침</a>에 동의합니다.</div>
+    <button class="auth-btn" style="margin-top:20px" onclick="doSignup()">가입하기</button>
+    <div class="auth-switch">이미 계정이 있으신가요? <span onclick="show('s-login')">로그인</span></div>
+  </div>
+</div>
+
+
+<!-- ── 메인 ── -->
+<div id="s-main" class="screen">
+  <div class="hd">
+    <div class="hd-top">
+      <div class="hd-logo">진천 자급자족</div>
+      <div class="hd-search">
+        <input placeholder="진천에서 찾기" onclick="show('s-filter')">
+        <button onclick="show('s-filter')">검색</button>
+      </div>
+    </div>
+    <div class="hd-cats">
+      <div class="hd-cat on">전체</div>
+      <div class="hd-cat">농산물</div>
+      <div class="hd-cat">생활가전</div>
+      <div class="hd-cat">의류</div>
+      <div class="hd-cat">가구</div>
+      <div class="hd-cat">유아</div>
+      <div class="hd-cat">스포츠</div>
+      <div class="hd-cat">기타</div>
+    </div>
+  </div>
+
+  <div class="fbar">
+    <button class="fpill on" onclick="show('s-filter')">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h10M3 6h6M5 9h2"/></svg>
+      필터
+    </button>
+    <button class="fpill" onclick="show('s-filter')">새상품/중고</button>
+    <button class="fpill" onclick="show('s-filter')">지역</button>
+    <button class="fpill" onclick="show('s-filter')">가격</button>
+    <button class="fpill" onclick="show('s-filter')">직거래</button>
+    <button class="fpill" onclick="show('s-filter')">낮은가격순 ▾</button>
+  </div>
+
+  <div class="ad-banner">
+    <div>
+      <div class="ad-banner-text">내 물건, 지금 바로 팔기</div>
+      <div class="ad-banner-sub">사진 찍고 올리면 끝 — 수수료 0원</div>
+    </div>
+    <button class="ad-banner-btn" onclick="show('s-reg')">판매하기</button>
+  </div>
+
+  <div class="grid">
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">🌽<div class="ribbon">새상품</div><div class="ribbon ad">광고</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">진천 햇옥수수 10개입 당일수확</div>
+        <div><span class="gcard-price">8,000원</span></div>
+        <div class="gcard-meta"><span>덕산읍</span><span>방금</span></div>
+      </div>
+    </div>
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">📱<div class="ribbon used">중고</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">아이폰 13 128GB 블루 풀박스</div>
+        <div><span class="gcard-price">480,000원</span><span class="gcard-original">650,000</span><span class="gcard-discount">26%</span></div>
+        <div class="gcard-meta"><span>진천읍</span><span>10분 전</span></div>
+      </div>
+    </div>
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">🪑<div class="ribbon used">중고</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">원목 식탁 4인용 의자 포함</div>
+        <div><span class="gcard-price">150,000원</span></div>
+        <div class="gcard-meta"><span>광혜원면</span><span>1시간</span></div>
+      </div>
+    </div>
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">🍎<div class="ribbon">새상품</div><div class="ribbon ad">광고</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">초평 사과 5kg 직거래 당도 높음</div>
+        <div><span class="gcard-price">25,000원</span></div>
+        <div class="gcard-meta"><span>초평면</span><span>2시간</span></div>
+      </div>
+    </div>
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">🛋️<div class="ribbon used">중고</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">3인용 패브릭 소파 깨끗한 상태</div>
+        <div><span class="gcard-price">80,000원</span><span class="gcard-original">200,000</span><span class="gcard-discount">60%</span></div>
+        <div class="gcard-meta"><span>이월면</span><span>3시간</span></div>
+      </div>
+    </div>
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">👟<div class="ribbon">새상품</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">나이키 에어맥스 270 270mm 미착용</div>
+        <div><span class="gcard-price">65,000원</span><span class="gcard-original">139,000</span><span class="gcard-discount">53%</span></div>
+        <div class="gcard-meta"><span>문백면</span><span>5시간</span></div>
+      </div>
+    </div>
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">🥕<div class="ribbon">새상품</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">유기농 당근 3kg 직거래</div>
+        <div><span class="gcard-price">12,000원</span></div>
+        <div class="gcard-meta"><span>초평면</span><span>6시간</span></div>
+      </div>
+    </div>
+    <div class="gcard" onclick="show('s-detail')">
+      <div class="gcard-img">📚<div class="ribbon used">중고</div></div>
+      <div class="gcard-info">
+        <div class="gcard-name">중학교 교과서 전과목 세트 2026</div>
+        <div><span class="gcard-price">30,000원</span><span class="gcard-original">80,000</span><span class="gcard-discount">63%</span></div>
+        <div class="gcard-meta"><span>진천읍</span><span>어제</span></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 로컬 광고 슬롯 (계약 업체 생기면 여기 교체) -->
+  <div class="ad-slot" id="local-ad-slot">
+    <!-- 광고 없을 때: 문의 배너 -->
+    <div class="ad-slot-empty" onclick="showAdInquiry()">
+      <div class="ad-slot-empty-text">📢 이 자리에 진천 업체를 홍보하세요</div>
+      <button class="ad-slot-empty-btn">광고 문의</button>
+    </div>
+    <!-- 광고 있을 때 예시 (주석 해제해서 사용)
+    <div class="ad-slot-local" onclick="window.open('https://example.com')">
+      <span class="ad-slot-badge">광고</span>
+      <div class="ad-slot-content">
+        <div class="ad-slot-title">진천 맛집 이름</div>
+        <div class="ad-slot-sub">덕산읍 · 매일 11:00~21:00</div>
+      </div>
+      <span style="font-size:18px">›</span>
+    </div>
+    -->
+  </div>
+
+  <!-- 구글 애드센스 슬롯 (승인 후 아래 코드로 교체) -->
+  <div class="ad-adsense" id="adsense-slot">
+    <!-- 승인 전 플레이스홀더 -->
+    <div class="ad-adsense-placeholder">
+      광고 영역 (구글 애드센스 승인 후 활성화)
+    </div>
+    <!-- 승인 후 아래 코드 사용:
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    -->
+  </div>
+
+  <div style="height:80px"></div>
+  <button class="sell-fab" onclick="show('s-reg')">+ 판매하기</button>
+
+  <div class="bnav">
+    <div class="bn on"><div class="bn-ic">🏠</div>홈</div>
+    <div class="bn" onclick="show('s-filter')"><div class="bn-ic">🔍</div>검색</div>
+    <div class="bn" onclick="show('s-reg')"><div class="bn-ic">➕</div>판매</div>
+    <div class="bn"><div class="bn-ic">👤</div>나</div>
+  </div>
+</div>
+
+<!-- ── 필터 ── -->
+<div id="s-filter" class="screen">
+  <div class="fil-bar">
+    <button class="fil-back" onclick="show('s-main')">←</button>
+    <div class="fil-search">
+      <input placeholder="진천에서 찾기">
+    </div>
+  </div>
+  <div class="fil-body">
+    <div style="background:#fff;padding:10px 14px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;color:#666">결과 <strong style="color:#e8380d">127</strong>개</span>
+      <select style="font-size:13px;border:1px solid #ddd;border-radius:4px;padding:4px 8px;font-family:inherit;color:#333;outline:none;background:#fff">
+        <option>최신순</option><option>낮은 가격순</option><option>높은 가격순</option><option>거리순</option>
+      </select>
+    </div>
+    <div class="fil-section">
+      <div class="fil-section-title">카테고리</div>
+      <div class="fil-chips">
+        <button class="fil-chip on" onclick="ftog(this)">전체</button>
+        <button class="fil-chip" onclick="ftog(this)">농산물</button>
+        <button class="fil-chip" onclick="ftog(this)">생활가전</button>
+        <button class="fil-chip" onclick="ftog(this)">의류</button>
+        <button class="fil-chip" onclick="ftog(this)">가구</button>
+        <button class="fil-chip" onclick="ftog(this)">유아</button>
+        <button class="fil-chip" onclick="ftog(this)">기타</button>
+      </div>
+    </div>
+    <div class="fil-section">
+      <div class="fil-section-title">상태</div>
+      <div class="fil-chips">
+        <button class="fil-chip on" onclick="ftog(this)">전체</button>
+        <button class="fil-chip" onclick="ftog(this)">새상품</button>
+        <button class="fil-chip" onclick="ftog(this)">중고</button>
+      </div>
+    </div>
+    <div class="fil-section">
+      <div class="fil-section-title">지역</div>
+      <div class="fil-chips">
+        <button class="fil-chip on" onclick="ftog(this)">전체</button>
+        <button class="fil-chip" onclick="ftog(this)">진천읍</button>
+        <button class="fil-chip" onclick="ftog(this)">덕산읍</button>
+        <button class="fil-chip" onclick="ftog(this)">광혜원면</button>
+        <button class="fil-chip" onclick="ftog(this)">초평면</button>
+        <button class="fil-chip" onclick="ftog(this)">이월면</button>
+        <button class="fil-chip" onclick="ftog(this)">문백면</button>
+        <button class="fil-chip" onclick="ftog(this)">백곡면</button>
+      </div>
+    </div>
+    <div class="fil-section">
+      <div class="fil-section-title">가격대</div>
+      <div class="fil-chips">
+        <button class="fil-chip" onclick="ftog(this)">1만원 이하</button>
+        <button class="fil-chip" onclick="ftog(this)">1~5만원</button>
+        <button class="fil-chip" onclick="ftog(this)">5~20만원</button>
+        <button class="fil-chip" onclick="ftog(this)">20만원 이상</button>
+      </div>
+      <div class="price-inputs">
+        <input type="number" placeholder="최소"><span>~</span><input type="number" placeholder="최대"><span>원</span>
+      </div>
+    </div>
+    <div class="fil-section">
+      <div class="fil-section-title">거래방식</div>
+      <div class="fil-chips">
+        <button class="fil-chip" onclick="ftog(this)">직거래</button>
+        <button class="fil-chip" onclick="ftog(this)">택배</button>
+        <button class="fil-chip" onclick="ftog(this)">가격제안 가능</button>
+      </div>
+    </div>
+  </div>
+  <div class="fil-foot">
+    <button class="fil-reset">초기화</button>
+    <button class="fil-apply" onclick="show('s-main')">결과보기 127개</button>
+  </div>
+</div>
+
+<!-- ── 상세 ── -->
+<div id="s-detail" class="screen">
+  <div class="det-bar">
+    <button class="det-back" onclick="show('s-main')">←</button>
+    <div style="flex:1"></div>
+    <span style="font-size:22px;cursor:pointer">🤍</span>
+    <span style="font-size:22px;cursor:pointer;margin-left:10px">⋯</span>
+  </div>
+  <div class="det-imgs">🌽<div class="det-counter">1 / 4</div></div>
+  <div class="det-main">
+    <div class="det-badges"><span class="det-badge det-badge-new">새상품</span></div>
+    <div class="det-name">진천 햇옥수수 10개입 당일수확 직거래</div>
+    <div class="det-price-row">
+      <span class="det-price">8,000원</span>
+    </div>
+    <div class="det-meta"><span>덕산읍</span><span>조회 142</span><span>관심 23</span></div>
+  </div>
+  <div class="det-divider"></div>
+  <div class="det-seller">
+    <div class="det-avatar">👨‍🌾</div>
+    <div>
+      <div class="det-sname">진천농부김씨</div>
+      <div class="det-ssub">덕산읍 · 매너온도 36.8°</div>
+    </div>
+  </div>
+  <div class="det-divider"></div>
+  <div class="det-desc">오늘 아침 수확한 신선한 옥수수입니다.<br><br>진천 덕산읍 직접 재배. 당도 높고 싱싱해요.<br>직거래 우선, 택배 가능 (추가비용 있음).</div>
+  <div class="det-divider"></div>
+  <div class="det-spec">
+    <div class="det-spec-row"><span>상태</span><span>새상품</span></div>
+    <div class="det-spec-row"><span>거래</span><span>직거래 · 택배</span></div>
+    <div class="det-spec-row"><span>지역</span><span>덕산읍</span></div>
+    <div class="det-spec-row"><span>가격제안</span><span>가능</span></div>
+  </div>
+  <div style="height:70px"></div>
+  <div class="det-foot">
+    <button class="det-chat">채팅하기</button>
+    <button class="det-buy">구매하기</button>
+  </div>
+</div>
+
+<!-- ── 판매 등록 ── -->
+<div id="s-reg" class="screen">
+  <div class="reg-bar">
+    <button class="det-back" onclick="show('s-main')">←</button>
+    <div class="reg-title">판매하기</div>
+    <button class="reg-save">임시저장</button>
+  </div>
+  <div class="reg-body">
+    <div class="reg-photo">
+      <div class="reg-photo-label">사진 <span style="font-size:12px;color:#bbb;font-weight:400">(최대 10장)</span></div>
+      <div class="photo-scroll">
+        <div class="photo-add" onclick="document.getElementById('reg-image-input').click()"><div class="photo-add-ic">📷</div><div class="photo-add-txt">추가</div></div><input type="file" id="reg-image-input" accept="image/*" style="display:none">
+      </div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-row">
+        <div class="reg-label">카테고리 <span class="req">*</span></div>
+        <select class="reg-select">
+          <option value="">선택하세요</option>
+          <option>식품/농산물</option><option>생활가전</option><option>의류</option>
+          <option>가구</option><option>유아</option><option>스포츠</option><option>기타</option>
+        </select>
+      </div>
+      <div class="reg-row">
+        <div class="reg-label">상품명 <span class="req">*</span></div>
+        <input class="reg-input" type="text" placeholder="어떤 물건인가요?">
+      </div>
+      <div class="reg-row">
+        <div class="reg-label">상태 <span class="req">*</span></div>
+        <div class="reg-chips">
+          <button class="reg-chip on" onclick="condSel(this)">새상품</button>
+          <button class="reg-chip" onclick="condSel(this)">거의 새것</button>
+          <button class="reg-chip" onclick="condSel(this)">중고 양호</button>
+          <button class="reg-chip" onclick="condSel(this)">중고 보통</button>
+        </div>
+      </div>
+      <div class="reg-row">
+        <div class="reg-label">설명 <span class="req">*</span></div>
+        <textarea class="reg-textarea" id="ta" oninput="document.getElementById('tc').textContent=this.value.length+'/500'" placeholder="상품 상태, 특이사항 등을 적어주세요"></textarea>
+        <div class="reg-char" id="tc">0/500</div>
+      </div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-row">
+        <div class="reg-label">가격 <span class="req">*</span></div>
+        <div class="price-wrap">
+          <input class="reg-input" type="number" placeholder="0" style="font-size:20px;font-weight:700">
+          <span class="price-wrap-unit">원</span>
+        </div>
+        <div class="price-opts">
+          <label><input type="checkbox"> 가격제안 받기</label>
+          <label><input type="checkbox"> 나눔 (무료)</label>
+        </div>
+      </div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-row">
+        <div class="reg-label">거래방식 <span class="req">*</span></div>
+        <div class="reg-chips">
+          <button class="reg-chip on" onclick="dtog(this)">직거래</button>
+          <button class="reg-chip" onclick="dtog(this)">택배</button>
+        </div>
+      </div>
+      <div class="reg-row">
+        <div class="reg-label">지역 <span class="req">*</span></div>
+        <select class="reg-select">
+          <option>진천읍</option><option selected>덕산읍</option>
+          <option>광혜원면</option><option>초평면</option>
+          <option>이월면</option><option>문백면</option><option>백곡면</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="reg-foot">
+    <button class="reg-submit" onclick="alert('등록 완료! 🎉')">등록하기</button>
+  </div>
+</div>
+
+<script>
+
+// 로그인
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const err = document.getElementById('login-error');
+  if (!email || !pw) { err.classList.add('show'); return; }
+  err.classList.remove('show');
+  // 실제 서버 연동 전 임시 처리
+  localStorage.setItem('jc_user', JSON.stringify({ email, name: email.split('@')[0] }));
+  show('s-main');
+}
+
+// 소셜 로그인
+function socialLogin(type) {
+  localStorage.setItem('jc_user', JSON.stringify({ name: type + '사용자' }));
+  show('s-main');
+}
+
+// 회원가입
+function doSignup() {
+  const name   = document.getElementById('signup-name').value.trim();
+  const email  = document.getElementById('signup-email').value.trim();
+  const pw     = document.getElementById('signup-pw').value;
+  const pw2    = document.getElementById('signup-pw2').value;
+  const region = document.getElementById('signup-region').value;
+  const err    = document.getElementById('signup-error');
+
+  if (!name || !email || !pw || !region) {
+    err.textContent = '모든 항목을 입력해주세요.';
+    err.classList.add('show'); return;
+  }
+  if (pw.length < 8) {
+    err.textContent = '비밀번호는 8자 이상이어야 해요.';
+    err.classList.add('show'); return;
+  }
+  if (pw !== pw2) {
+    err.textContent = '비밀번호가 일치하지 않아요.';
+    err.classList.add('show'); return;
+  }
+  err.classList.remove('show');
+  localStorage.setItem('jc_user', JSON.stringify({ name, email, region }));
+  alert('가입 완료! 환영합니다 😊');
+  show('s-main');
+}
+
+// 휴대폰 인증
+function sendVerify() {
+  const phone = document.getElementById('signup-phone').value.trim();
+  if (!phone) { alert('휴대폰 번호를 입력해주세요.'); return; }
+  alert('인증번호가 발송됐어요! (실제 서비스 연동 필요)');
+}
+
+// 로그아웃
+function doLogout() {
+  localStorage.removeItem('jc_user');
+  show('s-login');
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function ftog(el) { el.classList.toggle('on'); }
+function condSel(el) {
+  el.closest('.reg-chips').querySelectorAll('.reg-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+function dtog(el) { el.classList.toggle('on'); }
+document.querySelectorAll('.hd-cat').forEach(c => {
+  c.onclick = () => { document.querySelectorAll('.hd-cat').forEach(x => x.classList.remove('on')); c.classList.add('on'); };
+});
+
+
+<style>
+/* ── 내 정보 ── */
+.my-header { background: #e8380d; padding: 28px 20px 20px; }
+.my-avatar { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px; }
+.my-name { font-size: 18px; font-weight: 700; color: #fff; }
+.my-region { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+.my-stats { display: flex; background: #fff; border-bottom: 1px solid #f0f0f0; }
+.my-stat { flex: 1; padding: 16px 0; text-align: center; cursor: pointer; }
+.my-stat + .my-stat { border-left: 1px solid #f0f0f0; }
+.my-stat-num { font-size: 18px; font-weight: 700; color: #111; }
+.my-stat-label { font-size: 11px; color: #aaa; margin-top: 3px; }
+.my-menu { background: #fff; }
+.my-menu-item { display: flex; align-items: center; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; }
+.my-menu-item:active { background: #fafafa; }
+.my-menu-ic { font-size: 20px; width: 28px; text-align: center; }
+.my-menu-label { font-size: 15px; color: #222; flex: 1; }
+.my-menu-arrow { font-size: 14px; color: #ccc; }
+.my-section-title { font-size: 13px; font-weight: 700; color: #999; padding: 14px 16px 6px; background: #f7f7f7; }
+.my-sell-item { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; background: #fff; }
+.my-sell-img { width: 70px; height: 70px; border-radius: 8px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+.my-sell-body { flex: 1; }
+.my-sell-name { font-size: 14px; color: #222; margin-bottom: 4px; }
+.my-sell-price { font-size: 15px; font-weight: 700; }
+.my-sell-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-top: 5px; }
+.status-selling { background: #e8f4e8; color: #2d7a00; }
+.status-reserved { background: #fff3e0; color: #e65100; }
+.status-done { background: #f0f0f0; color: #888; }
+.review-card { background: #fff; margin: 8px 14px; border-radius: 10px; border: 1px solid #eee; padding: 14px; }
+.review-stars { font-size: 14px; color: #f5a623; margin-bottom: 6px; }
+.review-text { font-size: 14px; color: #333; line-height: 1.6; }
+.review-meta { font-size: 11px; color: #bbb; margin-top: 8px; }
+/* ── 구매 / 완료 ── */
+.pay-bar { height: 52px; display: flex; align-items: center; padding: 0 14px; gap: 12px; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 50; }
+.pay-back { font-size: 22px; cursor: pointer; background: none; border: none; font-family: inherit; color: #111; }
+.pay-title { font-size: 16px; font-weight: 700; flex: 1; }
+.pay-product { background: #fff; padding: 16px 14px; border-bottom: 8px solid #f5f5f5; display: flex; gap: 12px; align-items: center; }
+.pay-product-img { width: 70px; height: 70px; border-radius: 8px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+.pay-product-name { font-size: 14px; color: #222; margin-bottom: 5px; }
+.pay-product-price { font-size: 16px; font-weight: 700; }
+.pay-section { background: #fff; padding: 16px 14px; border-bottom: 8px solid #f5f5f5; }
+.pay-section-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+.pay-input { width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 11px 13px; font-size: 14px; font-family: inherit; outline: none; color: #111; background: #fafafa; margin-bottom: 8px; }
+.pay-input:focus { border-color: #e8380d; background: #fff; }
+.pay-method { display: flex; gap: 8px; flex-wrap: wrap; }
+.pay-method-btn { padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #555; background: #fff; cursor: pointer; font-family: inherit; }
+.pay-method-btn.on { border-color: #e8380d; color: #e8380d; background: #fff8f7; font-weight: 700; }
+.pay-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 14px; border-bottom: 1px solid #f8f8f8; }
+.pay-row:last-child { border: none; }
+.pay-total span:last-child { color: #e8380d; font-weight: 700; font-size: 17px; }
+.pay-foot { background: #fff; border-top: 1px solid #eee; padding: 12px 14px; position: sticky; bottom: 0; }
+.pay-btn { width: 100%; background: #e8380d; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.done-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; padding: 40px 24px; text-align: center; }
+.done-ic { font-size: 64px; margin-bottom: 20px; }
+.done-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.done-sub { font-size: 14px; color: #888; line-height: 1.7; margin-bottom: 32px; }
+.done-btn { width: 100%; background: #e8380d; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 10px; }
+.done-btn-outline { width: 100%; background: #fff; color: #e8380d; border: 1.5px solid #e8380d; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+</style>
+
+<!-- ── 내 정보 ── -->
+<div id="s-my" class="screen">
+  <div class="my-header">
+    <div class="my-avatar">😊</div>
+    <div class="my-name" id="my-name-text">홍길동</div>
+    <div class="my-region" id="my-region-text">덕산읍</div>
+  </div>
+  <div class="my-stats">
+    <div class="my-stat" onclick="show('s-myselling')"><div class="my-stat-num">3</div><div class="my-stat-label">판매중</div></div>
+    <div class="my-stat"><div class="my-stat-num">12</div><div class="my-stat-label">거래완료</div></div>
+    <div class="my-stat"><div class="my-stat-num">4.9★</div><div class="my-stat-label">매너온도</div></div>
+  </div>
+  <div class="my-section-title">내 활동</div>
+  <div class="my-menu">
+    <div class="my-menu-item" onclick="show('s-myselling')"><span class="my-menu-ic">📦</span><span class="my-menu-label">내 판매 목록</span><span class="my-menu-arrow">›</span></div>
+    <div class="my-menu-item"><span class="my-menu-ic">❤️</span><span class="my-menu-label">관심 상품</span><span class="my-menu-arrow">›</span></div>
+    <div class="my-menu-item" onclick="show('s-reviews')"><span class="my-menu-ic">⭐</span><span class="my-menu-label">받은 후기</span><span class="my-menu-arrow">›</span></div>
+    <div class="my-menu-item"><span class="my-menu-ic">🧾</span><span class="my-menu-label">구매 내역</span><span class="my-menu-arrow">›</span></div>
+  </div>
+  <div class="my-section-title">설정</div>
+  <div class="my-menu">
+    <div class="my-menu-item"><span class="my-menu-ic">👤</span><span class="my-menu-label">프로필 수정</span><span class="my-menu-arrow">›</span></div>
+    <div class="my-menu-item"><span class="my-menu-ic">🔔</span><span class="my-menu-label">알림 설정</span><span class="my-menu-arrow">›</span></div>
+    <div class="my-menu-item"><span class="my-menu-ic">📋</span><span class="my-menu-label">이용약관</span><span class="my-menu-arrow">›</span></div>
+    <div class="my-menu-item" onclick="doLogout()"><span class="my-menu-ic">🚪</span><span class="my-menu-label" style="color:#e8380d">로그아웃</span><span class="my-menu-arrow">›</span></div>
+  </div>
+  <div style="height:70px"></div>
+  <div class="bnav">
+    <div class="bn" onclick="show('s-main')"><div class="bn-ic">🏠</div>홈</div>
+    <div class="bn" onclick="show('s-filter')"><div class="bn-ic">🔍</div>검색</div>
+    <div class="bn" onclick="show('s-reg')"><div class="bn-ic">➕</div>판매</div>
+    <div class="bn on"><div class="bn-ic">👤</div>나</div>
+  </div>
+</div>
+
+<!-- ── 내 판매 목록 ── -->
+<div id="s-myselling" class="screen">
+  <div class="pay-bar">
+    <button class="pay-back" onclick="show('s-my')">←</button>
+    <div class="pay-title">내 판매 목록</div>
+  </div>
+  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">🌽</div><div class="my-sell-body"><div class="my-sell-name">진천 햇옥수수 10개입 당일수확</div><div class="my-sell-price">8,000원</div><div><span class="my-sell-status status-selling">판매중</span></div></div></div>
+  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">🍎</div><div class="my-sell-body"><div class="my-sell-name">초평 사과 5kg 직거래</div><div class="my-sell-price">25,000원</div><div><span class="my-sell-status status-reserved">예약중</span></div></div></div>
+  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">🪑</div><div class="my-sell-body"><div class="my-sell-name">원목 식탁 4인용 의자 포함</div><div class="my-sell-price">150,000원</div><div><span class="my-sell-status status-done">거래완료</span></div></div></div>
+  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">📱</div><div class="my-sell-body"><div class="my-sell-name">아이폰 13 128GB 블루</div><div class="my-sell-price">480,000원</div><div><span class="my-sell-status status-done">거래완료</span></div></div></div>
+</div>
+
+<!-- ── 받은 후기 ── -->
+<div id="s-reviews" class="screen">
+  <div class="pay-bar">
+    <button class="pay-back" onclick="show('s-my')">←</button>
+    <div class="pay-title">받은 후기</div>
+  </div>
+  <div style="padding:16px;background:#f7f7f7;text-align:center">
+    <div style="font-size:32px;font-weight:700;color:#e8380d">4.9★</div>
+    <div style="font-size:13px;color:#aaa;margin-top:4px">총 12개의 후기</div>
+  </div>
+  <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">옥수수가 정말 신선하고 달았어요! 판매자분도 친절하시고 직거래도 편했어요 😊</div><div class="review-meta">진천읍 구매자 · 2026.04.20</div></div>
+  <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">사과 당도가 진짜 최고예요. 마트보다 훨씬 맛있고 가격도 저렴해요. 강추합니다!</div><div class="review-meta">덕산읍 구매자 · 2026.04.15</div></div>
+  <div class="review-card"><div class="review-stars">★★★★☆</div><div class="review-text">식탁 상태 좋고 약속 시간도 잘 지켜주셨어요. 감사합니다!</div><div class="review-meta">광혜원면 구매자 · 2026.04.10</div></div>
+</div>
+
+<!-- ── 구매 화면 ── -->
+<div id="s-pay" class="screen">
+  <div class="pay-bar">
+    <button class="pay-back" onclick="show('s-detail')">←</button>
+    <div class="pay-title">구매하기</div>
+  </div>
+  <div class="pay-product">
+    <div class="pay-product-img">🌽</div>
+    <div><div class="pay-product-name">진천 햇옥수수 10개입 당일수확</div><div class="pay-product-price">8,000원</div></div>
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">거래 방식</div>
+    <div class="pay-method">
+      <button class="pay-method-btn on" onclick="payMethod(this)">직거래</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">택배</button>
+    </div>
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">거래 장소</div>
+    <input class="pay-input" type="text" placeholder="거래 장소 입력" value="혁신도시 이마트 앞">
+    <input class="pay-input" type="text" placeholder="거래 가능 시간" value="오후 6시 이후">
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">결제 수단</div>
+    <div class="pay-method">
+      <button class="pay-method-btn on" onclick="payMethod(this)">계좌이체</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">카카오페이</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">네이버페이</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">현금</button>
+    </div>
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">결제 금액</div>
+    <div class="pay-row"><span>상품 금액</span><span>8,000원</span></div>
+    <div class="pay-row"><span>배송비</span><span>0원 (직거래)</span></div>
+    <div class="pay-row pay-total"><span style="font-weight:700">최종 결제</span><span style="color:#e8380d;font-weight:700;font-size:17px">8,000원</span></div>
+  </div>
+  <div style="height:80px"></div>
+  <div class="pay-foot">
+    <button class="pay-btn" onclick="show('s-done')">8,000원 결제하기</button>
+  </div>
+</div>
+
+<!-- ── 완료 화면 ── -->
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-ic">🎉</div>
+    <div class="done-title">구매 완료!</div>
+    <div class="done-sub">판매자에게 알림이 전송됐어요.<br>거래 약속 시간에 만나서 완료해주세요.<br><br>거래 후 꼭 후기를 남겨주세요 😊</div>
+    <button class="done-btn" onclick="show('s-main')">홈으로 돌아가기</button>
+    <button class="done-btn-outline" onclick="show('s-my')">내 구매 내역 보기</button>
+  </div>
+</div>
+
+<script>
+function loadMyInfo() {
+  const user = JSON.parse(localStorage.getItem('jc_user') || '{"name":"홍길동","region":"덕산읍"}');
+  const n = document.getElementById('my-name-text');
+  const r = document.getElementById('my-region-text');
+  if (n) n.textContent = user.name || '홍길동';
+  if (r) r.textContent = user.region || '진천';
+}
+function payMethod(el) {
+  el.closest('.pay-method').querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const buyBtn = document.querySelector('.det-buy');
+  if (buyBtn) buyBtn.onclick = () => show('s-pay');
+  document.querySelectorAll('.bn').forEach(bn => {
+    if (bn.textContent.includes('나')) bn.onclick = () => { loadMyInfo(); show('s-my'); };
+  });
+  loadMyInfo();
+});
+</script>
