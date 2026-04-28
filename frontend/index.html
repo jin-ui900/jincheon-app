@@ -954,6 +954,198 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+<script>
+// ── 회원가입 검증 ─────────────────────────────────────────────
+
+// 이름 검증
+function validateName() {
+  const val = document.getElementById('signup-name').value.trim();
+  const msg = document.getElementById('name-msg');
+  const inp = document.getElementById('signup-name');
+  if (!val) { msg.textContent=''; inp.className='auth-input'; return false; }
+  if (val.length < 2) {
+    msg.textContent='이름은 2자 이상 입력해주세요';
+    msg.className='field-msg err'; inp.className='auth-input err'; return false;
+  }
+  msg.textContent='✓'; msg.className='field-msg ok'; inp.className='auth-input ok'; return true;
+}
+
+// 이메일 중복 확인
+let emailChecked = false;
+function resetEmailCheck() {
+  emailChecked = false;
+  document.getElementById('email-msg').textContent='';
+  document.getElementById('email-msg').className='field-msg';
+  document.getElementById('signup-email').className='auth-input';
+  document.getElementById('btn-email-check').style.background='#e8380d';
+}
+async function checkEmail() {
+  const email = document.getElementById('signup-email').value.trim();
+  const msg   = document.getElementById('email-msg');
+  const inp   = document.getElementById('signup-email');
+  const reg   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!reg.test(email)) {
+    msg.textContent='올바른 이메일 형식이 아니에요'; msg.className='field-msg err'; inp.className='auth-input err'; return;
+  }
+  msg.textContent='확인 중...'; msg.className='field-msg info';
+  try {
+    const API = typeof API_BASE !== 'undefined' ? API_BASE : 'https://jincheon-app-production.up.railway.app';
+    const res  = await fetch(`${API}/api/users/check-email?email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    if (data.available) {
+      msg.textContent='✓ 사용 가능한 이메일이에요'; msg.className='field-msg ok'; inp.className='auth-input ok';
+      emailChecked = true;
+      document.getElementById('btn-email-check').style.background='#2d7a00';
+    } else {
+      msg.textContent='이미 사용 중인 이메일이에요'; msg.className='field-msg err'; inp.className='auth-input err';
+      emailChecked = false;
+    }
+  } catch(e) {
+    msg.textContent='확인 중 오류가 발생했어요'; msg.className='field-msg err';
+  }
+}
+
+// 비밀번호 강도
+function checkPwStrength() {
+  const pw  = document.getElementById('signup-pw').value;
+  const msg = document.getElementById('pw-msg');
+  const bars = ['ps1','ps2','ps3','ps4'];
+  bars.forEach(id => { const el=document.getElementById(id); if(el) el.style.background='#eee'; });
+  if (!pw) { msg.textContent=''; return; }
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Za-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const colors = ['#e8380d','#ff9800','#ffc107','#2d7a00'];
+  const labels = ['매우 약함','약함','보통','강함'];
+  for (let i=0; i<score; i++) { const el=document.getElementById(bars[i]); if(el) el.style.background=colors[score-1]; }
+  msg.textContent='비밀번호 강도: '+(labels[score-1]||'');
+  msg.className = score >= 3 ? 'field-msg ok' : 'field-msg err';
+}
+
+// 비밀번호 일치 확인
+function checkPwMatch() {
+  const pw  = document.getElementById('signup-pw').value;
+  const pw2 = document.getElementById('signup-pw2').value;
+  const msg = document.getElementById('pw2-msg');
+  const inp = document.getElementById('signup-pw2');
+  if (!pw2) { msg.textContent=''; inp.className='auth-input'; return; }
+  if (pw === pw2) {
+    msg.textContent='✓ 비밀번호가 일치해요'; msg.className='field-msg ok'; inp.className='auth-input ok';
+  } else {
+    msg.textContent='비밀번호가 일치하지 않아요'; msg.className='field-msg err'; inp.className='auth-input err';
+  }
+}
+
+// 비밀번호 보기/숨기기
+function togglePw(id) {
+  const inp = document.getElementById(id);
+  if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// 전화번호 자동 하이픈
+function formatPhone() {
+  const inp = document.getElementById('signup-phone');
+  let val = inp.value.replace(/\D/g,'');
+  if (val.length <= 3) inp.value = val;
+  else if (val.length <= 7) inp.value = val.slice(0,3)+'-'+val.slice(3);
+  else inp.value = val.slice(0,3)+'-'+val.slice(3,7)+'-'+val.slice(7,11);
+}
+
+// 전체 동의 토글
+function toggleAllAgree() {
+  const all = document.getElementById('agree-all').checked;
+  ['agree-terms','agree-privacy','agree-marketing'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = all;
+  });
+}
+function checkAgree() {
+  const t = document.getElementById('agree-terms')?.checked;
+  const p = document.getElementById('agree-privacy')?.checked;
+  const m = document.getElementById('agree-marketing')?.checked;
+  const allEl = document.getElementById('agree-all');
+  if (allEl) allEl.checked = t && p && m;
+}
+
+// 약관 보기 모달
+let currentTermsId = '';
+function showTerms(type) {
+  currentTermsId = type;
+  const modal = document.getElementById('terms-modal');
+  const title = document.getElementById('terms-modal-title');
+  const body  = document.getElementById('terms-modal-content');
+  if (!modal || !title || !body) return;
+  if (type === 'terms') {
+    title.textContent = '이용약관';
+    body.innerHTML = '<p><strong>제1조 (목적)</strong></p><p>본 약관은 진천 자급자족 서비스 이용과 관련하여 권리, 의무 및 책임사항을 규정합니다.</p><br><p><strong>제2조 (서비스 이용)</strong></p><p>진천군 주민이라면 누구나 무료로 이용할 수 있습니다. 허위 정보 등록, 사기 거래 등 불법행위는 서비스 이용이 제한될 수 있습니다.</p><br><p><strong>제3조 (수수료)</strong></p><p>본 서비스는 거래 수수료를 받지 않습니다. 광고 수익으로 운영됩니다.</p><br><p><strong>제4조 (면책)</strong></p><p>서비스는 판매자와 구매자 간의 거래를 중개할 뿐이며, 거래의 안전성에 대한 책임을 지지 않습니다.</p>';
+  } else {
+    title.textContent = '개인정보 처리방침';
+    body.innerHTML = '<p><strong>1. 수집하는 개인정보</strong></p><p>이름, 이메일, 지역, 휴대폰 번호(선택)</p><br><p><strong>2. 수집 목적</strong></p><p>회원 식별, 거래 중개, 서비스 운영</p><br><p><strong>3. 보관 기간</strong></p><p>회원 탈퇴 시까지. 단, 관련 법령에 따라 일정 기간 보관할 수 있습니다.</p><br><p><strong>4. 제3자 제공</strong></p><p>법령에 의한 경우를 제외하고 개인정보를 제3자에게 제공하지 않습니다.</p><br><p><strong>5. 문의</strong></p><p>ad@jincheon-shop.kr</p>';
+  }
+  modal.style.display = 'flex';
+}
+function agreeAndClose() {
+  if (currentTermsId === 'terms') { const el=document.getElementById('agree-terms'); if(el) el.checked=true; }
+  if (currentTermsId === 'privacy') { const el=document.getElementById('agree-privacy'); if(el) el.checked=true; }
+  checkAgree();
+  const modal = document.getElementById('terms-modal');
+  if (modal) modal.style.display='none';
+}
+
+// 회원가입 처리
+async function doSignup() {
+  const name   = document.getElementById('signup-name')?.value.trim();
+  const email  = document.getElementById('signup-email')?.value.trim();
+  const pw     = document.getElementById('signup-pw')?.value;
+  const pw2    = document.getElementById('signup-pw2')?.value;
+  const region = document.getElementById('signup-region')?.value;
+  const phone  = document.getElementById('signup-phone')?.value.trim();
+  const err    = document.getElementById('signup-error');
+  const btn    = document.querySelector('#s-signup .auth-btn');
+
+  const showErr = (msg) => { if (err) { err.textContent=msg; err.classList.add('show'); err.style.display='block'; } };
+  if (err) { err.classList.remove('show'); err.style.display='none'; }
+
+  if (!name || name.length < 2)      { showErr('이름을 2자 이상 입력해주세요'); return; }
+  if (!emailChecked)                  { showErr('이메일 중복 확인을 해주세요'); return; }
+  if (!pw || pw.length < 8)          { showErr('비밀번호는 8자 이상이어야 해요'); return; }
+  if (!/[A-Za-z]/.test(pw))          { showErr('비밀번호에 영문자를 포함해주세요'); return; }
+  if (!/[0-9]/.test(pw))             { showErr('비밀번호에 숫자를 포함해주세요'); return; }
+  if (pw !== pw2)                     { showErr('비밀번호가 일치하지 않아요'); return; }
+  if (!region)                        { showErr('거주 지역을 선택해주세요'); return; }
+  if (!document.getElementById('agree-terms')?.checked)   { showErr('이용약관에 동의해주세요'); return; }
+  if (!document.getElementById('agree-privacy')?.checked) { showErr('개인정보 처리방침에 동의해주세요'); return; }
+
+  if (btn) { btn._orig=btn.textContent; btn.textContent='처리 중...'; btn.disabled=true; btn.style.opacity='0.7'; }
+  try {
+    const API = typeof API_BASE !== 'undefined' ? API_BASE : 'https://jincheon-app-production.up.railway.app';
+    const res = await fetch(`${API}/api/users/signup`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, email, password:pw, phone, region})
+    });
+    const data = await res.json();
+    if (!res.ok) { showErr(data.detail||'오류가 발생했어요'); return; }
+    localStorage.setItem('jc_token', data.token);
+    localStorage.setItem('jc_user', JSON.stringify({name:data.name, region:data.region}));
+    const showFn = typeof show === 'function' ? show : window.show;
+    if (showFn) { showFn('s-main'); }
+    const loadFn = typeof loadProducts === 'function' ? loadProducts : window.loadProducts;
+    if (loadFn) loadFn();
+    const infoFn = typeof loadMyInfo === 'function' ? loadMyInfo : window.loadMyInfo;
+    if (infoFn) infoFn();
+    alert('가입 완료! 환영합니다 😊');
+  } catch(e) {
+    showErr('서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요.');
+  } finally {
+    if (btn) { btn.textContent=btn._orig||'가입하기'; btn.disabled=false; btn.style.opacity='1'; }
+  }
+}
+</script>
+
 <script src="api.js"></script>
 </body>
 </html>
