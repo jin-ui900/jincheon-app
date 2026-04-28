@@ -4,7 +4,9 @@
  */
 
 // ── 설정 ──────────────────────────────────────────────────────
-const API_BASE = "";
+const API_BASE = window.location.hostname === "localhost"
+  ? "http://localhost:8000"       // 로컬 개발
+  : "https://your-app.railway.app"; // 배포 주소 (Railway 배포 후 교체)
 
 // ── 토큰 관리 ─────────────────────────────────────────────────
 const Auth = {
@@ -392,37 +394,53 @@ async function doSignup() {
 async function submitProduct() {
   if (!Auth.isLoggedIn()) { toast("로그인이 필요해요"); show("s-login"); return; }
 
-  const title       = document.querySelector("#s-reg .reg-input[placeholder*='물건']")?.value.trim();
-  const description = document.querySelector("#s-reg .reg-textarea")?.value.trim();
-  const priceInput  = document.querySelector("#s-reg input[type=number]")?.value;
-  const category    = document.querySelector("#s-reg .reg-select")?.value;
-  const condition   = document.querySelector("#s-reg .reg-chip.on")?.textContent || "중고";
-  const region      = document.querySelectorAll("#s-reg .reg-select")[1]?.value;
-  const dealChips   = [...document.querySelectorAll("#s-reg .reg-chips:last-of-type .reg-chip.on")];
-  const dealType    = dealChips.map(c => c.textContent).join("+") || "직거래";
-  const imageInput  = document.getElementById("reg-image-input");
-  const btn         = document.querySelector("#s-reg .reg-submit");
+  const title     = document.getElementById("reg-title")?.value.trim();
+  const desc      = document.getElementById("reg-desc")?.value.trim();
+  const price     = document.getElementById("reg-price")?.value;
+  const category  = document.getElementById("reg-category")?.value || "기타";
+  const region    = document.getElementById("reg-region")?.value || "진천읍";
+  const condition = document.querySelector("#s-reg .reg-chip.on")?.textContent?.trim() || "중고";
+  const dealChips = [...(document.querySelectorAll("#s-reg .reg-chips") || [])];
+  const dealOn    = dealChips.length > 1
+    ? [...dealChips[dealChips.length-1].querySelectorAll(".reg-chip.on")].map(c=>c.textContent.trim()).join("+")
+    : "직거래";
+  const imageInput = document.getElementById("reg-image-input");
+  const btn        = document.getElementById("reg-submit-btn");
 
-  if (!title || !priceInput) { toast("상품명과 가격을 입력해주세요", true); return; }
+  // 검증
+  if (!title)  { toast("상품명을 입력해주세요", true); return; }
+  if (!price || Number(price) <= 0) { toast("가격을 입력해주세요", true); return; }
 
   const formData = new FormData();
-  formData.append("title", title);
-  formData.append("description", description || "");
-  formData.append("price", priceInput);
-  formData.append("category", category || "기타");
-  formData.append("condition", condition);
-  formData.append("region", region || "");
-  formData.append("deal_type", dealType);
+  formData.append("title",       title);
+  formData.append("description", desc || "");
+  formData.append("price",       price);
+  formData.append("category",    category);
+  formData.append("condition",   condition);
+  formData.append("region",      region);
+  formData.append("deal_type",   dealOn || "직거래");
   if (imageInput?.files[0]) formData.append("image", imageInput.files[0]);
 
   setLoading(btn, true);
   try {
-    await ProductAPI.create(formData);
-    toast("등록 완료! 🎉");
+    const token = Auth.getToken();
+    const res = await fetch(`${API_BASE}/api/products`, {
+      method: "POST",
+      headers: token ? { "Authorization": `Bearer ${token}` } : {},
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) { toast(data.detail || "등록 실패", true); return; }
+    toast("상품이 등록됐어요 🎉");
+    // 폼 초기화
+    ["reg-title","reg-desc","reg-price"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
     await loadProducts();
     show("s-main");
-  } catch (e) {
-    toast(e.message, true);
+  } catch(e) {
+    toast("서버 연결 오류가 발생했어요", true);
   } finally {
     setLoading(btn, false);
   }

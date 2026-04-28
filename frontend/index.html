@@ -620,7 +620,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
     <div class="reg-card">
       <div class="reg-row">
         <div class="reg-label">카테고리 <span class="req">*</span></div>
-        <select class="reg-select">
+        <select class="reg-select" id="reg-category">
           <option value="">선택하세요</option>
           <option>식품/농산물</option><option>생활가전</option><option>의류</option>
           <option>가구</option><option>유아</option><option>스포츠</option><option>기타</option>
@@ -628,7 +628,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
       </div>
       <div class="reg-row">
         <div class="reg-label">상품명 <span class="req">*</span></div>
-        <input class="reg-input" type="text" placeholder="어떤 물건인가요?">
+        <input class="reg-input" type="text" id="reg-title" placeholder="어떤 물건인가요?">
       </div>
       <div class="reg-row">
         <div class="reg-label">상태 <span class="req">*</span></div>
@@ -641,7 +641,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
       </div>
       <div class="reg-row">
         <div class="reg-label">설명 <span class="req">*</span></div>
-        <textarea class="reg-textarea" id="ta" oninput="document.getElementById('tc').textContent=this.value.length+'/500'" placeholder="상품 상태, 특이사항 등을 적어주세요"></textarea>
+        <textarea class="reg-textarea" id="reg-desc" oninput="document.getElementById('tc').textContent=this.value.length+'/500'" placeholder="상품 상태, 특이사항 등을 적어주세요"></textarea>
         <div class="reg-char" id="tc">0/500</div>
       </div>
     </div>
@@ -649,7 +649,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
       <div class="reg-row">
         <div class="reg-label">가격 <span class="req">*</span></div>
         <div class="price-wrap">
-          <input class="reg-input" type="number" placeholder="0" style="font-size:20px;font-weight:700">
+          <input class="reg-input" type="number" id="reg-price" placeholder="0" style="font-size:20px;font-weight:700">
           <span class="price-wrap-unit">원</span>
         </div>
         <div class="price-opts">
@@ -668,7 +668,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
       </div>
       <div class="reg-row">
         <div class="reg-label">지역 <span class="req">*</span></div>
-        <select class="reg-select">
+        <select class="reg-select" id="reg-region">
           <option>진천읍</option><option selected>덕산읍</option>
           <option>광혜원면</option><option>초평면</option>
           <option>이월면</option><option>문백면</option><option>백곡면</option>
@@ -677,7 +677,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
     </div>
   </div>
   <div class="reg-foot">
-    <button class="reg-submit" onclick="alert('등록 완료! 🎉')">등록하기</button>
+    <button class="reg-submit" id="reg-submit-btn" onclick="submitProduct()">등록하기</button>
   </div>
 </div>
 
