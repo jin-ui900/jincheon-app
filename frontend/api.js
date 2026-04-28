@@ -508,22 +508,99 @@ async function loadMyInfo() {
 async function loadMySelling() {
   if (!Auth.isLoggedIn()) { show("s-login"); return; }
   show("s-myselling");
-  const list = document.querySelector("#s-myselling .my-selling-list") || document.getElementById("s-myselling");
+  const list = document.getElementById("my-selling-list");
   if (!list) return;
+  list.innerHTML = '<div style="padding:40px;text-align:center;color:#aaa;font-size:14px">로딩 중...</div>';
   try {
     const items = await ProductAPI.mySelling();
-    const statusLabel = { "판매중": "status-selling", "예약중": "status-reserved", "거래완료": "status-done" };
-    const html = items.map(p => `
-      <div class="my-sell-item" onclick="openDetail(${p.id})">
-        <div class="my-sell-img">${p.image_path ? `<img src="${API_BASE}${p.image_path}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">` : "🛍️"}</div>
-        <div class="my-sell-body">
-          <div class="my-sell-name">${p.title}</div>
-          <div class="my-sell-price">${formatPrice(p.price)}</div>
-          <div><span class="my-sell-status ${statusLabel[p.status] || ""}">${p.status}</span></div>
-        </div>
-      </div>`).join("") || `<div style="padding:40px;text-align:center;color:#aaa;font-size:14px">판매 상품이 없어요</div>`;
-    list.innerHTML = html;
-  } catch (e) { toast(e.message, true); }
+    if (!items.length) {
+      list.innerHTML = '<div style="padding:40px;text-align:center;color:#aaa;font-size:14px">판매 상품이 없어요</div>';
+      return;
+    }
+    const statusMap = {
+      "판매중":   { cls: "status-selling", label: "판매중" },
+      "예약중":   { cls: "status-reserved", label: "예약중" },
+      "거래완료": { cls: "status-done",    label: "거래완료" },
+      "판매중단": { cls: "status-stopped", label: "판매중단" },
+    };
+    const emoji = { "식품/농산물":"🌾","생활가전":"📺","의류":"👕","가구":"🪑","유아":"🧸","스포츠":"⚽" };
+
+    list.innerHTML = items.map(p => {
+      const st = statusMap[p.status] || { cls:"", label: p.status };
+      const img = p.image_path
+        ? `<img src="${p.image_path}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`
+        : (emoji[p.category] || "🛍️");
+
+      // 상태별 액션 버튼
+      let actionBtns = "";
+      if (p.status === "판매중") {
+        actionBtns = `
+          <button class="sell-action-btn btn-stop" onclick="event.stopPropagation();changeProductStatus(${p.id},'판매중단')">판매중단</button>
+          <button class="sell-action-btn btn-complete" onclick="event.stopPropagation();changeProductStatus(${p.id},'거래완료')">거래완료</button>`;
+      } else if (p.status === "판매중단") {
+        actionBtns = `
+          <button class="sell-action-btn btn-restart" onclick="event.stopPropagation();changeProductStatus(${p.id},'판매중')">다시 판매</button>
+          <button class="sell-action-btn btn-delete" onclick="event.stopPropagation();deleteProduct(${p.id})">삭제</button>`;
+      } else if (p.status === "예약중") {
+        actionBtns = `
+          <button class="sell-action-btn btn-complete" onclick="event.stopPropagation();changeProductStatus(${p.id},'거래완료')">거래완료</button>`;
+      }
+
+      return `
+        <div class="my-sell-item" onclick="openDetail(${p.id})">
+          <div class="my-sell-img">${img}</div>
+          <div class="my-sell-body">
+            <div class="my-sell-name">${p.title}</div>
+            <div class="my-sell-price">${formatPrice(p.price)}</div>
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-top:5px">
+              <span class="my-sell-status ${st.cls}">${st.label}</span>
+              ${actionBtns}
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+  } catch (e) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#e8380d;font-size:13px">불러오기 실패</div>';
+  }
+}
+
+// ── 상품 상태 변경 ──────────────────────────────────────────
+async function changeProductStatus(productId, newStatus) {
+  if (!confirm(`상품을 "${newStatus}" 처리할까요?`)) return;
+  try {
+    const token = Auth.getToken();
+    const formData = new FormData();
+    formData.append("status", newStatus);
+    const res = await fetch(`/api/products/${productId}`, {
+      method: "PUT",
+      headers: token ? { "Authorization": `Bearer ${token}` } : {},
+      body: formData
+    });
+    if (!res.ok) { toast("변경 실패", true); return; }
+    toast(`"${newStatus}"로 변경됐어요`);
+    await loadMySelling();
+    await loadProducts();
+  } catch(e) {
+    toast("오류가 발생했어요", true);
+  }
+}
+
+// ── 상품 삭제 ──────────────────────────────────────────────
+async function deleteProduct(productId) {
+  if (!confirm("상품을 삭제할까요? 되돌릴 수 없어요.")) return;
+  try {
+    const token = Auth.getToken();
+    const res = await fetch(`/api/products/${productId}`, {
+      method: "DELETE",
+      headers: token ? { "Authorization": `Bearer ${token}` } : {},
+    });
+    if (!res.ok) { toast("삭제 실패", true); return; }
+    toast("삭제됐어요");
+    await loadMySelling();
+    await loadProducts();
+  } catch(e) {
+    toast("오류가 발생했어요", true);
+  }
 }
 
 // ── 로그아웃 ──────────────────────────────────────────────────

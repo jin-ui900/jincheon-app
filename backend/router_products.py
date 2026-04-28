@@ -104,7 +104,7 @@ async def list_products(
     sql = f"""
         SELECT p.*, u.name as seller_name, u.region as seller_region
         FROM products p JOIN users u ON p.user_id=u.id
-        WHERE p.status != '거래완료'
+        WHERE p.status NOT IN ('거래완료', '판매중단')
         ORDER BY {order}
     """
     all_rows = await db.fetch(sql)

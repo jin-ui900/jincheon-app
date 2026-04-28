@@ -719,6 +719,12 @@ document.querySelectorAll('.hd-cat').forEach(c => {
 .status-selling { background: #e8f4e8; color: #2d7a00; }
 .status-reserved { background: #fff3e0; color: #e65100; }
 .status-done { background: #f0f0f0; color: #888; }
+.status-stopped { background: #fff0f0; color: #e8380d; }
+.sell-action-btn { font-size: 11px; padding: 4px 10px; border-radius: 5px; border: none; cursor: pointer; font-family: inherit; font-weight: 700; margin-left: 6px; }
+.btn-stop { background: #fff0f0; color: #e8380d; border: 1px solid #fdd; }
+.btn-restart { background: #e8f4e8; color: #2d7a00; border: 1px solid #c8e6c9; }
+.btn-complete { background: #e8f4e8; color: #2d7a00; border: 1px solid #c8e6c9; }
+.btn-delete { background: #f5f5f5; color: #888; border: 1px solid #eee; }
 .review-card { background: #fff; margin: 8px 14px; border-radius: 10px; border: 1px solid #eee; padding: 14px; }
 .review-stars { font-size: 14px; color: #f5a623; margin-bottom: 6px; }
 .review-text { font-size: 14px; color: #333; line-height: 1.6; }
@@ -792,10 +798,7 @@ document.querySelectorAll('.hd-cat').forEach(c => {
     <button class="pay-back" onclick="show('s-my')">←</button>
     <div class="pay-title">내 판매 목록</div>
   </div>
-  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">🌽</div><div class="my-sell-body"><div class="my-sell-name">진천 햇옥수수 10개입 당일수확</div><div class="my-sell-price">8,000원</div><div><span class="my-sell-status status-selling">판매중</span></div></div></div>
-  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">🍎</div><div class="my-sell-body"><div class="my-sell-name">초평 사과 5kg 직거래</div><div class="my-sell-price">25,000원</div><div><span class="my-sell-status status-reserved">예약중</span></div></div></div>
-  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">🪑</div><div class="my-sell-body"><div class="my-sell-name">원목 식탁 4인용 의자 포함</div><div class="my-sell-price">150,000원</div><div><span class="my-sell-status status-done">거래완료</span></div></div></div>
-  <div class="my-sell-item" onclick="show('s-detail')"><div class="my-sell-img">📱</div><div class="my-sell-body"><div class="my-sell-name">아이폰 13 128GB 블루</div><div class="my-sell-price">480,000원</div><div><span class="my-sell-status status-done">거래완료</span></div></div></div>
+  <div id="my-selling-list"></div>
 </div>
 
 <!-- ── 받은 후기 ── -->
