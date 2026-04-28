@@ -203,7 +203,10 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
       <input class="auth-input" type="password" id="login-pw" placeholder="비밀번호 입력">
     </div>
     <button class="auth-btn" onclick="doLogin()">로그인</button>
-    <button class="auth-btn-outline" onclick="show('s-signup')">회원가입</button>
+    <div class="auth-switch" style="margin-bottom:-8px;">
+      비밀번호를 잊으셨나요? <span onclick="show('s-find-pw')">비밀번호 찾기</span>
+    </div>
+    <div class="auth-switch">계정이 없으신가요? <span onclick="show('s-signup')">회원가입</span></div>
     <div class="auth-divider">
       <div class="auth-divider-line"></div>
       <div class="auth-divider-text">또는 소셜 로그인</div>
@@ -213,7 +216,46 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
       <button class="auth-social-btn kakao" onclick="socialLogin('카카오')">카카오로 시작하기</button>
       <button class="auth-social-btn naver" onclick="socialLogin('네이버')">네이버로 시작하기</button>
     </div>
-    <div class="auth-switch">계정이 없으신가요? <span onclick="show('s-signup')">회원가입</span></div>
+  </div>
+</div>
+
+<!-- ── 비밀번호 찾기 ── -->
+<div id="s-find-pw" class="screen">
+  <div class="auth-wrap" style="justify-content:flex-start;padding-top:24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+      <button onclick="show('s-login')" style="font-size:22px;background:none;border:none;cursor:pointer;color:#111">←</button>
+      <div style="font-size:18px;font-weight:700">비밀번호 찾기</div>
+    </div>
+    <div style="font-size:13px;color:#666;line-height:1.6;margin-bottom:20px;">
+      가입할 때 입력하신 이름, 이메일, 지역을 입력해 주세요.<br>정보가 일치하면 새 비밀번호로 즉시 변경됩니다.
+    </div>
+    <div class="auth-error" id="findpw-error"></div>
+
+    <div class="auth-field">
+      <label class="auth-label">이름</label>
+      <input class="auth-input" type="text" id="findpw-name" placeholder="가입한 이름">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">이메일</label>
+      <input class="auth-input" type="email" id="findpw-email" placeholder="가입한 이메일">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">가입 시 선택한 지역</label>
+      <select class="auth-input" id="findpw-region" style="cursor:pointer">
+        <option value="">지역 선택</option>
+        <option>진천읍</option><option>덕산읍</option><option>광혜원면</option>
+        <option>초평면</option><option>이월면</option><option>문백면</option><option>백곡면</option>
+      </select>
+    </div>
+    <div class="auth-field" style="margin-top:24px;">
+      <label class="auth-label">새 비밀번호</label>
+      <div style="position:relative">
+        <input class="auth-input" type="password" id="findpw-newpw" placeholder="영문+숫자 포함 8자 이상">
+        <button onclick="togglePw('findpw-newpw')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:#aaa">👁</button>
+      </div>
+    </div>
+
+    <button class="auth-btn" style="margin-top:16px" onclick="doResetPw()">비밀번호 변경하기</button>
   </div>
 </div>
 
@@ -1080,6 +1122,57 @@ async function doSignup() {
     showErr('서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요.');
   } finally {
     if (btn) { btn.textContent=btn._orig||'가입하기'; btn.disabled=false; btn.style.opacity='1'; }
+  }
+}
+
+// 비밀번호 재설정 (새로 추가)
+async function doResetPw() {
+  const name   = document.getElementById('findpw-name')?.value.trim();
+  const email  = document.getElementById('findpw-email')?.value.trim();
+  const region = document.getElementById('findpw-region')?.value;
+  const newPw  = document.getElementById('findpw-newpw')?.value;
+  const err    = document.getElementById('findpw-error');
+  const btn    = document.querySelector('#s-find-pw .auth-btn');
+
+  const check = (cond, msg) => { 
+    if (cond) { 
+      if (err) { err.textContent = msg; err.classList.add("show"); err.style.display = 'block'; } 
+      return false; 
+    } 
+    return true; 
+  };
+
+  if (err) { err.classList.remove("show"); err.style.display = 'none'; }
+
+  if (!check(!name, "이름을 입력해주세요")) return;
+  if (!check(!email, "이메일을 입력해주세요")) return;
+  if (!check(!region, "지역을 선택해주세요")) return;
+  if (!check(!newPw || newPw.length < 8, "새 비밀번호는 8자 이상이어야 해요")) return;
+  if (!check(!/[A-Za-z]/.test(newPw) || !/[0-9]/.test(newPw), "새 비밀번호에 영문과 숫자를 포함해주세요")) return;
+
+  if (btn) { btn._orig=btn.textContent; btn.textContent='처리 중...'; btn.disabled=true; btn.style.opacity='0.7'; }
+  try {
+    const API = typeof API_BASE !== 'undefined' ? API_BASE : 'https://jincheon-app-production.up.railway.app';
+    const res = await fetch(`${API}/api/users/reset-password`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, name, region, new_password: newPw })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || '오류가 발생했어요');
+
+    alert('비밀번호가 성공적으로 변경됐어요! 새 비밀번호로 로그인해 주세요 😊');
+    
+    // 폼 초기화 및 화면 이동
+    document.getElementById('findpw-name').value = '';
+    document.getElementById('findpw-email').value = '';
+    document.getElementById('findpw-region').value = '';
+    document.getElementById('findpw-newpw').value = '';
+    show('s-login');
+  } catch (e) {
+    if (err) { err.textContent = e.message; err.classList.add("show"); err.style.display = 'block'; }
+  } finally {
+    if (btn) { btn.textContent=btn._orig||'비밀번호 변경하기'; btn.disabled=false; btn.style.opacity='1'; }
   }
 }
 </script>

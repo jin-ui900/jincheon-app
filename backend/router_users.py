@@ -28,6 +28,13 @@ class UpdateRequest(BaseModel):
     phone: str = ""
     region: str = ""
 
+# 새롭게 추가된 비밀번호 재설정용 모델
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    name: str
+    region: str
+    new_password: str
+
 
 # ── 이메일 중복 확인 ──────────────────────────────────────────
 
@@ -141,3 +148,23 @@ async def update_me(
         body.name, body.phone, body.region, current_user["id"]
     )
     return {"message": "프로필이 수정됐어요"}
+
+
+# ── 비밀번호 재설정 ─────────────────────────────────────────────
+
+@router.post("/reset-password")
+async def reset_password(body: ResetPasswordRequest, db=Depends(get_db)):
+    user = await db.fetchrow(
+        "SELECT id FROM users WHERE email=$1 AND name=$2 AND region=$3",
+        body.email, body.name, body.region
+    )
+    if not user:
+        raise HTTPException(400, "입력하신 정보와 일치하는 계정을 찾을 수 없어요.")
+
+    validate_password(body.new_password)
+    hashed = hash_password(body.new_password)
+    await db.execute(
+        "UPDATE users SET password=$1 WHERE id=$2",
+        hashed, user["id"]
+    )
+    return {"message": "비밀번호가 성공적으로 변경됐어요."}

@@ -103,6 +103,13 @@ const UserAPI = {
     return await api("GET", "/api/users/me");
   },
 
+  // 비밀번호 재설정
+  async resetPassword(email, name, region, newPassword) {
+    return await api("POST", "/api/users/reset-password", {
+      email, name, region, new_password: newPassword
+    });
+  },
+
   // 로그아웃
   logout() {
     Auth.removeToken();
