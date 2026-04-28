@@ -210,23 +210,23 @@ function formatTime(dateStr) {
 
 // 상품 카드 HTML 생성
 function renderProductCard(p) {
-  const discount = p.original_price
-    ? Math.round((1 - p.price / p.original_price) * 100)
-    : null;
+  const isUsed = p.condition === "중고";
+  const emoji = {
+    "식품/농산물": "🌾", "생활가전": "📺", "의류": "👕",
+    "가구": "🪑", "유아": "🧸", "스포츠": "⚽", "기타": "🛍️"
+  }[p.category] || "🛍️";
+
   return `
     <div class="gcard" onclick="openDetail(${p.id})">
       <div class="gcard-img">
         ${p.image_path
-          ? `<img src="${API_BASE}${p.image_path}" style="width:100%;height:100%;object-fit:cover">`
-          : "🛍️"}
-        <div class="ribbon ${p.condition === "중고" ? "used" : ""}">${p.condition}</div>
+          ? `<img src="${p.image_path}" style="width:100%;height:100%;object-fit:cover">`
+          : emoji}
+        <div class="ribbon ${isUsed ? "used" : ""}">${p.condition || "새상품"}</div>
       </div>
       <div class="gcard-info">
         <div class="gcard-name">${p.title}</div>
-        <div>
-          <span class="gcard-price">${formatPrice(p.price)}</span>
-          ${discount ? `<span class="gcard-discount">${discount}%</span>` : ""}
-        </div>
+        <div><span class="gcard-price">${formatPrice(p.price)}</span></div>
         <div class="gcard-meta">
           <span>${p.region || ""}</span>
           <span>${formatTime(p.created_at)}</span>
@@ -240,7 +240,7 @@ let currentPage = 1;
 let currentFilter = {};
 
 async function loadProducts(filter = {}, append = false) {
-  const grid = document.querySelector(".grid");
+  const grid = document.getElementById("main-grid");
   if (!grid) return;
 
   if (!append) {
@@ -255,7 +255,7 @@ async function loadProducts(filter = {}, append = false) {
     if (!append) grid.innerHTML = "";
 
     if (res.items.length === 0 && !append) {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#aaa;font-size:14px">상품이 없어요</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#aaa;font-size:14px">아직 등록된 상품이 없어요.<br>첫 번째 판매자가 되어보세요! 🌿</div>`;
       return;
     }
 
@@ -265,10 +265,7 @@ async function loadProducts(filter = {}, append = false) {
 
     currentPage++;
   } catch (err) {
-    if (!append) {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#e8380d;font-size:13px">${err.message}</div>`;
-    }
-    toast(err.message, true);
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#e8380d;font-size:13px">${err.message}</div>`;
   }
 }
 
@@ -281,38 +278,59 @@ async function openDetail(productId) {
     const p = await ProductAPI.get(productId);
     currentProduct = p;
 
-    document.getElementById("detailTitle") && (document.getElementById("detailTitle").textContent = p.title);
-    const priceEl = document.querySelector(".det-price");
-    if (priceEl) priceEl.textContent = formatPrice(p.price);
-    const descEl = document.querySelector(".det-desc");
-    if (descEl) descEl.innerHTML = (p.description || "").replace(/\n/g, "<br>");
-    const metaEl = document.querySelector(".det-meta");
-    if (metaEl) metaEl.innerHTML = `<span>${p.region || ""}</span><span>조회 ${p.view_count}</span><span>관심 ${p.like_count}</span>`;
-    const nameEl = document.querySelector(".det-sname");
-    if (nameEl) nameEl.textContent = p.seller_name || "";
-    const subEl = document.querySelector(".det-ssub");
-    if (subEl) subEl.textContent = p.seller_region || "";
-
     // 이미지
-    const imgEl = document.querySelector(".det-imgs");
-    if (imgEl && p.image_path) {
-      imgEl.innerHTML = `<img src="${API_BASE}${p.image_path}" style="width:100%;height:100%;object-fit:cover">`;
+    const imgEl = document.getElementById("det-img");
+    if (imgEl) {
+      const emoji = {"식품/농산물":"🌾","생활가전":"📺","의류":"👕","가구":"🪑","유아":"🧸","스포츠":"⚽"}[p.category] || "🛍️";
+      imgEl.innerHTML = p.image_path
+        ? `<img src="${p.image_path}" style="width:100%;height:100%;object-fit:cover">`
+        : emoji;
     }
 
-    // 관심 버튼 상태
+    // 배지
+    const badgesEl = document.getElementById("det-badges");
+    if (badgesEl) {
+      const cls = p.condition === "중고" ? "det-badge-used" : "det-badge-new";
+      badgesEl.innerHTML = `<span class="det-badge ${cls}">${p.condition || "새상품"}</span>`;
+    }
+
+    // 제목, 가격
+    const nameEl = document.getElementById("det-name");
+    if (nameEl) nameEl.textContent = p.title || "";
+    const priceEl = document.getElementById("det-price");
+    if (priceEl) priceEl.textContent = formatPrice(p.price);
+
+    // 메타
+    const metaEl = document.getElementById("det-meta");
+    if (metaEl) metaEl.innerHTML = `<span>${p.region||""}</span><span>조회 ${p.view_count||0}</span><span>관심 ${p.like_count||0}</span>`;
+
+    // 판매자
+    const snameEl = document.getElementById("det-sname");
+    if (snameEl) snameEl.textContent = p.seller_name || "";
+    const ssubEl = document.getElementById("det-ssub");
+    if (ssubEl) ssubEl.textContent = (p.seller_region || "") + " 판매자";
+
+    // 설명
+    const descEl = document.getElementById("det-desc");
+    if (descEl) descEl.innerHTML = (p.description || "").replace(/
+/g, "<br>");
+
+    // 스펙
+    const condEl = document.getElementById("det-condition");
+    if (condEl) condEl.textContent = p.condition || "";
+    const dealEl = document.getElementById("det-deal");
+    if (dealEl) dealEl.textContent = p.deal_type || "";
+    const regEl = document.getElementById("det-region");
+    if (regEl) regEl.textContent = p.region || "";
+    const offerEl = document.getElementById("det-offer");
+    if (offerEl) offerEl.textContent = p.allow_offer ? "가능" : "불가";
+
+    // 관심 버튼
     const heartEl = document.querySelector(".det-heart");
     if (heartEl) heartEl.textContent = p.liked ? "❤️" : "🤍";
 
-    // 스펙 업데이트
-    const specRows = document.querySelectorAll(".det-spec-row span:last-child");
-    if (specRows.length >= 4) {
-      specRows[0].textContent = p.condition || "";
-      specRows[1].textContent = p.deal_type || "";
-      specRows[2].textContent = p.region || "";
-      specRows[3].textContent = p.allow_offer ? "가능" : "불가";
-    }
   } catch (err) {
-    toast(err.message, true);
+    toast("상품 정보를 불러올 수 없어요", true);
     show("s-main");
   }
 }

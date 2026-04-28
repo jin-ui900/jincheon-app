@@ -372,72 +372,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
     <button class="ad-banner-btn" onclick="show('s-reg')">판매하기</button>
   </div>
 
-  <div class="grid">
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">🌽<div class="ribbon">새상품</div><div class="ribbon ad">광고</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">진천 햇옥수수 10개입 당일수확</div>
-        <div><span class="gcard-price">8,000원</span></div>
-        <div class="gcard-meta"><span>덕산읍</span><span>방금</span></div>
-      </div>
-    </div>
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">📱<div class="ribbon used">중고</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">아이폰 13 128GB 블루 풀박스</div>
-        <div><span class="gcard-price">480,000원</span><span class="gcard-original">650,000</span><span class="gcard-discount">26%</span></div>
-        <div class="gcard-meta"><span>진천읍</span><span>10분 전</span></div>
-      </div>
-    </div>
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">🪑<div class="ribbon used">중고</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">원목 식탁 4인용 의자 포함</div>
-        <div><span class="gcard-price">150,000원</span></div>
-        <div class="gcard-meta"><span>광혜원면</span><span>1시간</span></div>
-      </div>
-    </div>
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">🍎<div class="ribbon">새상품</div><div class="ribbon ad">광고</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">초평 사과 5kg 직거래 당도 높음</div>
-        <div><span class="gcard-price">25,000원</span></div>
-        <div class="gcard-meta"><span>초평면</span><span>2시간</span></div>
-      </div>
-    </div>
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">🛋️<div class="ribbon used">중고</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">3인용 패브릭 소파 깨끗한 상태</div>
-        <div><span class="gcard-price">80,000원</span><span class="gcard-original">200,000</span><span class="gcard-discount">60%</span></div>
-        <div class="gcard-meta"><span>이월면</span><span>3시간</span></div>
-      </div>
-    </div>
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">👟<div class="ribbon">새상품</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">나이키 에어맥스 270 270mm 미착용</div>
-        <div><span class="gcard-price">65,000원</span><span class="gcard-original">139,000</span><span class="gcard-discount">53%</span></div>
-        <div class="gcard-meta"><span>문백면</span><span>5시간</span></div>
-      </div>
-    </div>
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">🥕<div class="ribbon">새상품</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">유기농 당근 3kg 직거래</div>
-        <div><span class="gcard-price">12,000원</span></div>
-        <div class="gcard-meta"><span>초평면</span><span>6시간</span></div>
-      </div>
-    </div>
-    <div class="gcard" onclick="show('s-detail')">
-      <div class="gcard-img">📚<div class="ribbon used">중고</div></div>
-      <div class="gcard-info">
-        <div class="gcard-name">중학교 교과서 전과목 세트 2026</div>
-        <div><span class="gcard-price">30,000원</span><span class="gcard-original">80,000</span><span class="gcard-discount">63%</span></div>
-        <div class="gcard-meta"><span>진천읍</span><span>어제</span></div>
-      </div>
-    </div>
-  </div>
+  <div class="grid" id="main-grid"></div>
 
 
   <!-- 로컬 광고 슬롯 (계약 업체 생기면 여기 교체) -->
@@ -570,31 +505,31 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
     <span style="font-size:22px;cursor:pointer">🤍</span>
     <span style="font-size:22px;cursor:pointer;margin-left:10px">⋯</span>
   </div>
-  <div class="det-imgs">🌽<div class="det-counter">1 / 4</div></div>
+  <div class="det-imgs" id="det-img">🛍️</div>
   <div class="det-main">
-    <div class="det-badges"><span class="det-badge det-badge-new">새상품</span></div>
-    <div class="det-name">진천 햇옥수수 10개입 당일수확 직거래</div>
+    <div class="det-badges" id="det-badges"></div>
+    <div class="det-name" id="det-name"></div>
     <div class="det-price-row">
-      <span class="det-price">8,000원</span>
+      <span class="det-price" id="det-price"></span>
     </div>
-    <div class="det-meta"><span>덕산읍</span><span>조회 142</span><span>관심 23</span></div>
+    <div class="det-meta" id="det-meta"></div>
   </div>
   <div class="det-divider"></div>
   <div class="det-seller">
     <div class="det-avatar">👨‍🌾</div>
     <div>
-      <div class="det-sname">진천농부김씨</div>
-      <div class="det-ssub">덕산읍 · 매너온도 36.8°</div>
+      <div class="det-sname" id="det-sname"></div>
+      <div class="det-ssub" id="det-ssub"></div>
     </div>
   </div>
   <div class="det-divider"></div>
-  <div class="det-desc">오늘 아침 수확한 신선한 옥수수입니다.<br><br>진천 덕산읍 직접 재배. 당도 높고 싱싱해요.<br>직거래 우선, 택배 가능 (추가비용 있음).</div>
+  <div class="det-desc" id="det-desc"></div>
   <div class="det-divider"></div>
   <div class="det-spec">
-    <div class="det-spec-row"><span>상태</span><span>새상품</span></div>
-    <div class="det-spec-row"><span>거래</span><span>직거래 · 택배</span></div>
-    <div class="det-spec-row"><span>지역</span><span>덕산읍</span></div>
-    <div class="det-spec-row"><span>가격제안</span><span>가능</span></div>
+    <div class="det-spec-row"><span>상태</span><span id="det-condition"></span></div>
+    <div class="det-spec-row"><span>거래</span><span id="det-deal"></span></div>
+    <div class="det-spec-row"><span>지역</span><span id="det-region"></span></div>
+    <div class="det-spec-row"><span>가격제안</span><span id="det-offer"></span></div>
   </div>
   <div style="height:70px"></div>
   <div class="det-foot">
