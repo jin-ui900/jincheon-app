@@ -4,7 +4,9 @@
  */
 
 // ── 설정 ──────────────────────────────────────────────────────
-const API_BASE = "https://jincheon-app-production.up.railway.app";
+const API_BASE = window.location.hostname === "localhost"
+  ? "http://localhost:8000"       // 로컬 개발
+  : "https://your-app.railway.app"; // 배포 주소 (Railway 배포 후 교체)
 
 // ── 토큰 관리 ─────────────────────────────────────────────────
 const Auth = {
