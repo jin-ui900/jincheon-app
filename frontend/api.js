@@ -312,8 +312,7 @@ async function openDetail(productId) {
 
     // 설명
     const descEl = document.getElementById("det-desc");
-    if (descEl) descEl.innerHTML = (p.description || "").replace(/
-/g, "<br>");
+    if (descEl) descEl.innerHTML = (p.description || "").split("\n").join("<br>");
 
     // 스펙
     const condEl = document.getElementById("det-condition");
