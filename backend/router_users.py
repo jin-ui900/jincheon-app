@@ -42,6 +42,8 @@ async def check_email(email: str, db=Depends(get_db)):
 # ── 비밀번호 검증 ─────────────────────────────────────────────
 
 def validate_password(pw: str):
+    if len(pw) > 72:
+        raise HTTPException(400, "비밀번호는 72자 이하로 입력해주세요")
     if len(pw) < 8:
         raise HTTPException(400, "비밀번호는 8자 이상이어야 해요")
     if not re.search(r"[A-Za-z]", pw):
