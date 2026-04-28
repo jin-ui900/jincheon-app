@@ -24,12 +24,35 @@ class LoginRequest(BaseModel):
     password: str
 
 
+# ── 이메일 중복 확인 ──────────────────────────────────────────
+
+@router.get("/check-email")
+async def check_email(email: str, db=Depends(get_db)):
+    import re
+    if not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", email):
+        raise HTTPException(400, "올바른 이메일 형식이 아니에요")
+    async with db.execute("SELECT id FROM users WHERE email=?", (email,)) as cur:
+        exists = await cur.fetchone()
+    return {"available": not bool(exists)}
+
+
+# ── 비밀번호 강도 검증 (서버사이드) ───────────────────────────
+
+def validate_password(pw: str):
+    import re
+    if len(pw) < 8:
+        raise HTTPException(400, "비밀번호는 8자 이상이어야 해요")
+    if not re.search(r"[A-Za-z]", pw):
+        raise HTTPException(400, "비밀번호에 영문자를 포함해주세요")
+    if not re.search(r"[0-9]", pw):
+        raise HTTPException(400, "비밀번호에 숫자를 포함해주세요")
+
+
 # ── 회원가입 ─────────────────────────────────────────────────
 
 @router.post("/signup")
 async def signup(body: SignupRequest, db=Depends(get_db)):
-    if len(body.password) < 8:
-        raise HTTPException(400, "비밀번호는 8자 이상이어야 해요")
+    validate_password(body.password)
 
     # 이메일 중복 확인
     async with db.execute("SELECT id FROM users WHERE email=?", (body.email,)) as cur:
