@@ -4,24 +4,28 @@ auth.py — JWT 토큰 발급 및 비밀번호 해싱
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
-from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+import bcrypt
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-SECRET_KEY = "jincheon-jageupjajok-secret-2026"  # 배포 시 환경변수로 교체
+SECRET_KEY = "jincheon-jageupjajok-secret-2026"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 24 * 7  # 7일
+ACCESS_TOKEN_EXPIRE_HOURS = 24 * 7
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password[:72])
+    pw = password[:72].encode("utf-8")
+    return bcrypt.hashpw(pw, bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain[:72], hashed)
+    try:
+        pw = plain[:72].encode("utf-8")
+        return bcrypt.checkpw(pw, hashed.encode("utf-8"))
+    except Exception:
+        return False
 
 
 def create_token(user_id: int, email: str) -> str:
@@ -53,7 +57,6 @@ async def get_current_user(
 async def get_optional_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)
 ):
-    """로그인 안 해도 되는 API용 (비회원 조회 허용)"""
     if not credentials:
         return None
     payload = decode_token(credentials.credentials)
