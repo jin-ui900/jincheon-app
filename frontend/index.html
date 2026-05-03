@@ -1,4 +1,4 @@
-index_content = """<!DOCTYPE html>
+html_content = """<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -721,4 +721,7 @@ async function doResetPw() {
 
 <script src="/app/api.js"></script>
 </body>
-</html>
+</html>"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(index_content)
