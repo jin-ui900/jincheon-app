@@ -109,17 +109,38 @@ async def list_products(
     """
     all_rows = await db.fetch(sql)
 
-    # 필터링
+    # -------------------------------------------------------------
+    # ⭐ 수정한 부분: 카테고리와 중고 상태를 똑똑하게 찾아내도록 변경
+    # -------------------------------------------------------------
     filtered = []
     for r in all_rows:
         d = serialize(r)
-        if category  and d.get("category")  != category:  continue
-        if condition  and d.get("condition") != condition: continue
-        if region     and d.get("region")    != region:    continue
-        if deal_type  and d.get("deal_type") != deal_type: continue
-        if d.get("price", 0) < min_price or d.get("price", 0) > max_price: continue
-        if keyword and keyword.lower() not in (d.get("title","") + d.get("description","")).lower(): continue
+        
+        # 1. 카테고리 필터 (부분 일치: '농산물' 검색 시 '식품/농산물'도 통과)
+        if category and category not in d.get("category", ""): 
+            continue
+            
+        # 2. 상태 필터 (새상품 vs 중고 묶음 처리)
+        if condition:
+            db_cond = d.get("condition", "")
+            if condition == "새상품" and db_cond != "새상품":
+                continue
+            # '중고'를 누르면 '새상품'이 아닌 모든 상태(중고 양호, 거의 새것 등)를 통과
+            if condition == "중고" and db_cond == "새상품":
+                continue
+                
+        # 3. 기존 필터 유지
+        if region and d.get("region") != region: 
+            continue
+        if deal_type and d.get("deal_type") != deal_type: 
+            continue
+        if d.get("price", 0) < min_price or d.get("price", 0) > max_price: 
+            continue
+        if keyword and keyword.lower() not in (d.get("title","") + d.get("description","")).lower(): 
+            continue
+            
         filtered.append(d)
+    # -------------------------------------------------------------
 
     total = len(filtered)
     start = (page - 1) * limit

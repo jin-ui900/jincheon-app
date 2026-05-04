@@ -250,12 +250,30 @@ async function loadProducts(filter = {}, append = false) {
   const grid = document.getElementById("main-grid");
   if (!grid) return;
 
+  // -------------------------------------------------------------
+  // ⭐ [새로 추가된 부분] 필터 화면에서 선택된 카테고리/상태 값 가져오기
+  // -------------------------------------------------------------
+  // 1. 카테고리 (전체가 아닐 경우에만 값 가져오기)
+  const catEl = document.querySelector('.fil-section:nth-child(2) .fil-chip.on');
+  const categoryValue = catEl && catEl.textContent !== '전체' ? catEl.textContent.trim() : '';
+
+  // 2. 상태 (새상품/중고 - 전체가 아닐 경우에만 값 가져오기)
+  const condEl = document.querySelector('.fil-section:nth-child(3) .fil-chip.on');
+  const conditionValue = condEl && condEl.textContent !== '전체' ? condEl.textContent.trim() : '';
+
+  // 읽어온 필터 값을 currentFilter 객체에 덮어씌웁니다.
+  currentFilter = {};
+  if (categoryValue) currentFilter.category = categoryValue;
+  if (conditionValue) currentFilter.condition = conditionValue;
+  // -------------------------------------------------------------
+
   if (!append) {
     grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#aaa;font-size:14px">로딩 중...</div>`;
     currentPage = 1;
   }
 
   try {
+    // [기존 코드] 이제 currentFilter에 카테고리와 상태 값이 포함되어 params로 들어갑니다.
     const params = { ...currentFilter, ...filter, page: currentPage, limit: 20 };
     const res = await ProductAPI.list(params);
 
@@ -416,20 +434,23 @@ async function doSignup() {
 async function submitProduct() {
   if (!Auth.isLoggedIn()) { toast("로그인이 필요해요"); show("s-login"); return; }
 
-  const title     = document.getElementById("reg-title")?.value.trim();
-  const desc      = document.getElementById("reg-desc")?.value.trim();
-  const price     = document.getElementById("reg-price")?.value;
-  const category  = document.getElementById("reg-category")?.value || "기타";
-  const region    = document.getElementById("reg-region")?.value || "진천읍";
-  const condition = document.querySelector("#s-reg .reg-chip.on")?.textContent?.trim() || "중고";
-  const dealChips = [...(document.querySelectorAll("#s-reg .reg-chips") || [])];
-  const dealOn    = dealChips.length > 1
-    ? [...dealChips[dealChips.length-1].querySelectorAll(".reg-chip.on")].map(c=>c.textContent.trim()).join("+")
-    : "직거래";
+  const title    = document.getElementById("reg-title")?.value.trim();
+  const desc     = document.getElementById("reg-desc")?.value.trim();
+  const price    = document.getElementById("reg-price")?.value;
+  const category = document.getElementById("reg-category")?.value; // 값이 없으면 빈 문자열("")
+  const region   = document.getElementById("reg-region")?.value || "진천읍";
+  
+  // 수정된 부분: 화면에 있는 여러 칩(버튼) 그룹을 순서대로 가져옵니다.
+  // 첫 번째 그룹은 '상태', 두 번째 그룹은 '거래방식' 입니다.
+  const chipGroups = document.querySelectorAll("#s-reg .reg-chips");
+  const condition = chipGroups[0]?.querySelector(".reg-chip.on")?.textContent?.trim() || "중고 양호";
+  const dealType  = chipGroups[1]?.querySelector(".reg-chip.on")?.textContent?.trim() || "직거래";
+
   const imageInput = document.getElementById("reg-image-input");
   const btn        = document.getElementById("reg-submit-btn");
 
-  // 검증
+  // 검증: 카테고리 필수 선택 추가
+  if (!category) { toast("카테고리를 선택해주세요", true); return; }
   if (!title)  { toast("상품명을 입력해주세요", true); return; }
   if (!price || Number(price) <= 0) { toast("가격을 입력해주세요", true); return; }
 
@@ -440,7 +461,7 @@ async function submitProduct() {
   formData.append("category",    category);
   formData.append("condition",   condition);
   formData.append("region",      region);
-  formData.append("deal_type",   dealOn || "직거래");
+  formData.append("deal_type",   dealType);
   if (imageInput?.files[0]) formData.append("image", imageInput.files[0]);
 
   setLoading(btn, true);
@@ -451,14 +472,19 @@ async function submitProduct() {
       headers: token ? { "Authorization": `Bearer ${token}` } : {},
       body: formData
     });
+    
     const data = await res.json();
     if (!res.ok) { toast(data.detail || "등록 실패", true); return; }
+    
     toast("상품이 등록됐어요 🎉");
-    // 폼 초기화
-    ["reg-title","reg-desc","reg-price"].forEach(id => {
+    
+    // 폼 초기화 (카테고리도 초기화되도록 추가)
+    ["reg-title", "reg-desc", "reg-price", "reg-category"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
+    if (imageInput) imageInput.value = "";
+    
     await loadProducts();
     show("s-main");
   } catch(e) {
