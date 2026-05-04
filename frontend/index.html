@@ -1,4 +1,4 @@
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -74,7 +74,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
 .gcard-img .ribbon.used { background: #3d9900; }
 .gcard-img .ribbon.ad { background: transparent; color: #bbb; border: 1px solid #ddd; font-size: 10px; font-weight: 400; top: 6px; left: auto; right: 6px; padding: 2px 6px; border-radius: 3px; }
 .gcard-info { padding: 10px 10px 14px; }
-.gcard-name { font-size: 13px; color: #222; line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gcard-name { font-size: 13px; color: #222; line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .gcard-price { font-size: 16px; font-weight: 700; color: #111; }
 .gcard-original { font-size: 11px; color: #bbb; text-decoration: line-through; margin-left: 4px; font-weight: 400; }
 .gcard-discount { font-size: 13px; color: #e8380d; font-weight: 700; margin-left: 4px; }
@@ -175,6 +175,70 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
 .fil-foot { background: #fff; border-top: 1px solid #eee; padding: 10px 14px; display: flex; gap: 8px; position: sticky; bottom: 0; }
 .fil-reset { flex: 1; padding: 13px; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 14px; color: #666; cursor: pointer; font-family: inherit; }
 .fil-apply { flex: 2; padding: 13px; border: none; border-radius: 6px; background: #e8380d; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+/* ── 내 정보 ── */
+.my-header { background: #e8380d; padding: 28px 20px 20px; }
+.my-avatar { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px; }
+.my-name { font-size: 18px; font-weight: 700; color: #fff; }
+.my-region { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+.my-stats { display: flex; background: #fff; border-bottom: 1px solid #f0f0f0; }
+.my-stat { flex: 1; padding: 16px 0; text-align: center; cursor: pointer; }
+.my-stat + .my-stat { border-left: 1px solid #f0f0f0; }
+.my-stat-num { font-size: 18px; font-weight: 700; color: #111; }
+.my-stat-label { font-size: 11px; color: #aaa; margin-top: 3px; }
+.my-menu { background: #fff; }
+.my-menu-item { display: flex; align-items: center; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; }
+.my-menu-item:active { background: #fafafa; }
+.my-menu-ic { font-size: 20px; width: 28px; text-align: center; }
+.my-menu-label { font-size: 15px; color: #222; flex: 1; }
+.my-menu-arrow { font-size: 14px; color: #ccc; }
+.my-section-title { font-size: 13px; font-weight: 700; color: #999; padding: 14px 16px 6px; background: #f7f7f7; }
+.my-sell-item { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; background: #fff; }
+.my-sell-img { width: 70px; height: 70px; border-radius: 8px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+.my-sell-body { flex: 1; }
+.my-sell-name { font-size: 14px; color: #222; margin-bottom: 4px; }
+.my-sell-price { font-size: 15px; font-weight: 700; }
+.my-sell-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-top: 5px; }
+.status-selling { background: #e8f4e8; color: #2d7a00; }
+.status-reserved { background: #fff3e0; color: #e65100; }
+.status-done { background: #f0f0f0; color: #888; }
+.status-stopped { background: #fff0f0; color: #e8380d; }
+.sell-action-btn { font-size: 11px; padding: 4px 10px; border-radius: 5px; border: none; cursor: pointer; font-family: inherit; font-weight: 700; margin-left: 6px; }
+.btn-stop { background: #fff0f0; color: #e8380d; border: 1px solid #fdd; }
+.btn-restart { background: #e8f4e8; color: #2d7a00; border: 1px solid #c8e6c9; }
+.btn-complete { background: #e8f4e8; color: #2d7a00; border: 1px solid #c8e6c9; }
+.btn-delete { background: #f5f5f5; color: #888; border: 1px solid #eee; }
+.review-card { background: #fff; margin: 8px 14px; border-radius: 10px; border: 1px solid #eee; padding: 14px; }
+.review-stars { font-size: 14px; color: #f5a623; margin-bottom: 6px; }
+.review-text { font-size: 14px; color: #333; line-height: 1.6; }
+.review-meta { font-size: 11px; color: #bbb; margin-top: 8px; }
+
+/* ── 구매 / 완료 ── */
+.pay-bar { height: 52px; display: flex; align-items: center; padding: 0 14px; gap: 12px; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 50; }
+.pay-back { font-size: 22px; cursor: pointer; background: none; border: none; font-family: inherit; color: #111; }
+.pay-title { font-size: 16px; font-weight: 700; flex: 1; }
+.pay-product { background: #fff; padding: 16px 14px; border-bottom: 8px solid #f5f5f5; display: flex; gap: 12px; align-items: center; }
+.pay-product-img { width: 70px; height: 70px; border-radius: 8px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+.pay-product-name { font-size: 14px; color: #222; margin-bottom: 5px; }
+.pay-product-price { font-size: 16px; font-weight: 700; }
+.pay-section { background: #fff; padding: 16px 14px; border-bottom: 8px solid #f5f5f5; }
+.pay-section-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+.pay-input { width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 11px 13px; font-size: 14px; font-family: inherit; outline: none; color: #111; background: #fafafa; margin-bottom: 8px; }
+.pay-input:focus { border-color: #e8380d; background: #fff; }
+.pay-method { display: flex; gap: 8px; flex-wrap: wrap; }
+.pay-method-btn { padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #555; background: #fff; cursor: pointer; font-family: inherit; }
+.pay-method-btn.on { border-color: #e8380d; color: #e8380d; background: #fff8f7; font-weight: 700; }
+.pay-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 14px; border-bottom: 1px solid #f8f8f8; }
+.pay-row:last-child { border: none; }
+.pay-total span:last-child { color: #e8380d; font-weight: 700; font-size: 17px; }
+.pay-foot { background: #fff; border-top: 1px solid #eee; padding: 12px 14px; position: sticky; bottom: 0; }
+.pay-btn { width: 100%; background: #e8380d; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.done-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; padding: 40px 24px; text-align: center; }
+.done-ic { font-size: 64px; margin-bottom: 20px; }
+.done-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.done-sub { font-size: 14px; color: #888; line-height: 1.7; margin-bottom: 32px; }
+.done-btn { width: 100%; background: #e8380d; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 10px; }
+.done-btn-outline { width: 100%; background: #fff; color: #e8380d; border: 1.5px solid #e8380d; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
 </style>
 </head>
 <body>
@@ -196,10 +260,12 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
       <input class="auth-input" type="password" id="login-pw" placeholder="비밀번호 입력">
     </div>
     <button class="auth-btn" onclick="doLogin()">로그인</button>
-    <div class="auth-switch" style="margin-bottom:-8px;">
+    <div class="auth-switch" style="margin-bottom:-8px; margin-top:24px;">
       비밀번호를 잊으셨나요? <span onclick="show('s-find-pw')">비밀번호 찾기</span>
     </div>
-    <div class="auth-switch">계정이 없으신가요? <span onclick="show('s-signup')">회원가입</span></div>
+    <div class="auth-switch" style="margin-top:16px;">
+      계정이 없으신가요? <span onclick="show('s-signup')">회원가입</span>
+    </div>
   </div>
 </div>
 
@@ -400,17 +466,15 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
 
   <div class="grid" id="main-grid"></div>
 
-
-  <!-- 로컬 광고 슬롯 (계약 업체 생기면 여기 교체) -->
+  <!-- 로컬 광고 슬롯 -->
   <div class="ad-slot" id="local-ad-slot">
-    <!-- 광고 없을 때: 문의 배너 -->
     <div class="ad-slot-empty" onclick="showAdInquiry()">
       <div class="ad-slot-empty-text">📢 이 자리에 진천 업체를 홍보하세요</div>
       <button class="ad-slot-empty-btn">광고 문의</button>
     </div>
   </div>
 
-  <!-- 구글 애드센스 슬롯 (승인 후 아래 코드로 교체) -->
+  <!-- 구글 애드센스 슬롯 -->
   <div class="ad-adsense" id="adsense-slot">
     <div class="ad-adsense-placeholder">
       광고 영역 (구글 애드센스 승인 후 활성화)
@@ -669,33 +733,275 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
   </div>
 </div>
 
+<!-- ── 내 판매 목록 ── -->
+<div id="s-myselling" class="screen">
+  <div class="pay-bar">
+    <button class="pay-back" onclick="show('s-my')">←</button>
+    <div class="pay-title">내 판매 목록</div>
+  </div>
+  <div id="my-selling-list"></div>
+</div>
+
+<!-- ── 받은 후기 ── -->
+<div id="s-reviews" class="screen">
+  <div class="pay-bar">
+    <button class="pay-back" onclick="show('s-my')">←</button>
+    <div class="pay-title">받은 후기</div>
+  </div>
+  <div style="padding:16px;background:#f7f7f7;text-align:center">
+    <div style="font-size:32px;font-weight:700;color:#e8380d">4.9★</div>
+    <div style="font-size:13px;color:#aaa;margin-top:4px">총 12개의 후기</div>
+  </div>
+  <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">옥수수가 정말 신선하고 달았어요! 판매자분도 친절하시고 직거래도 편했어요 😊</div><div class="review-meta">진천읍 구매자 · 2026.04.20</div></div>
+  <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">사과 당도가 진짜 최고예요. 마트보다 훨씬 맛있고 가격도 저렴해요. 강추합니다!</div><div class="review-meta">덕산읍 구매자 · 2026.04.15</div></div>
+  <div class="review-card"><div class="review-stars">★★★★☆</div><div class="review-text">식탁 상태 좋고 약속 시간도 잘 지켜주셨어요. 감사합니다!</div><div class="review-meta">광혜원면 구매자 · 2026.04.10</div></div>
+</div>
+
+<!-- ── 구매 화면 ── -->
+<div id="s-pay" class="screen">
+  <div class="pay-bar">
+    <button class="pay-back" onclick="show('s-detail')">←</button>
+    <div class="pay-title">구매하기</div>
+  </div>
+  <div class="pay-product">
+    <div class="pay-product-img">🌽</div>
+    <div><div class="pay-product-name">진천 햇옥수수 10개입 당일수확</div><div class="pay-product-price">8,000원</div></div>
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">거래 방식</div>
+    <div class="pay-method">
+      <button class="pay-method-btn on" onclick="payMethod(this)">직거래</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">택배</button>
+    </div>
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">거래 장소</div>
+    <input class="pay-input" type="text" placeholder="거래 장소 입력" value="혁신도시 이마트 앞">
+    <input class="pay-input" type="text" placeholder="거래 가능 시간" value="오후 6시 이후">
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">결제 수단</div>
+    <div class="pay-method">
+      <button class="pay-method-btn on" onclick="payMethod(this)">계좌이체</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">카카오페이</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">네이버페이</button>
+      <button class="pay-method-btn" onclick="payMethod(this)">현금</button>
+    </div>
+  </div>
+  <div class="pay-section">
+    <div class="pay-section-title">결제 금액</div>
+    <div class="pay-row"><span>상품 금액</span><span>8,000원</span></div>
+    <div class="pay-row"><span>배송비</span><span>0원 (직거래)</span></div>
+    <div class="pay-row pay-total"><span style="font-weight:700">최종 결제</span><span style="color:#e8380d;font-weight:700;font-size:17px">8,000원</span></div>
+  </div>
+  <div style="height:80px"></div>
+  <div class="pay-foot">
+    <button class="pay-btn" onclick="show('s-done')">8,000원 결제하기</button>
+  </div>
+</div>
+
+<!-- ── 완료 화면 ── -->
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-ic">🎉</div>
+    <div class="done-title">구매 완료!</div>
+    <div class="done-sub">판매자에게 알림이 전송됐어요.<br>거래 약속 시간에 만나서 완료해주세요.<br><br>거래 후 꼭 후기를 남겨주세요 😊</div>
+    <button class="done-btn" onclick="show('s-main')">홈으로 돌아가기</button>
+    <button class="done-btn-outline" onclick="show('s-my')">내 구매 내역 보기</button>
+  </div>
+</div>
+
 <script>
-// (Previous JS functions here - keeping it concise but assuming the user replaces the whole file)
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+// ── 회원가입 검증 ─────────────────────────────────────────────
+
+// 이름 검증
+function validateName() {
+  const val = document.getElementById('signup-name').value.trim();
+  const msg = document.getElementById('name-msg');
+  const inp = document.getElementById('signup-name');
+  if (!val) { msg.textContent=''; inp.className='auth-input'; return false; }
+  if (val.length < 2) {
+    msg.textContent='이름은 2자 이상 입력해주세요';
+    msg.className='field-msg err'; inp.className='auth-input err'; return false;
+  }
+  msg.textContent='✓'; msg.className='field-msg ok'; inp.className='auth-input ok'; return true;
 }
 
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pw = document.getElementById('login-pw').value;
-  const err = document.getElementById('login-error');
-  const btn = document.querySelector('#s-login .auth-btn');
-  if (!email || !pw) { err.classList.add('show'); return; }
-  setLoading(btn, true);
+// 이메일 중복 확인
+let emailChecked = false;
+function resetEmailCheck() {
+  emailChecked = false;
+  document.getElementById('email-msg').textContent='';
+  document.getElementById('email-msg').className='field-msg';
+  document.getElementById('signup-email').className='auth-input';
+  document.getElementById('btn-email-check').style.background='#e8380d';
+}
+async function checkEmail() {
+  const email = document.getElementById('signup-email').value.trim();
+  const msg   = document.getElementById('email-msg');
+  const inp   = document.getElementById('signup-email');
+  const reg   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!reg.test(email)) {
+    msg.textContent='올바른 이메일 형식이 아니에요'; msg.className='field-msg err'; inp.className='auth-input err'; return;
+  }
+  msg.textContent='확인 중...'; msg.className='field-msg info';
   try {
-    await UserAPI.login(email, pw);
-    show('s-main');
-    await loadProducts();
-    loadMyInfo();
-  } catch (e) {
-    err.textContent = e.message; err.classList.add('show');
-  } finally {
-    setLoading(btn, false);
+    const API = typeof API_BASE !== 'undefined' ? API_BASE : 'https://jincheon-app-production.up.railway.app';
+    const res  = await fetch(`${API}/api/users/check-email?email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    if (data.available) {
+      msg.textContent='✓ 사용 가능한 이메일이에요'; msg.className='field-msg ok'; inp.className='auth-input ok';
+      emailChecked = true;
+      document.getElementById('btn-email-check').style.background='#2d7a00';
+    } else {
+      msg.textContent='이미 사용 중인 이메일이에요'; msg.className='field-msg err'; inp.className='auth-input err';
+      emailChecked = false;
+    }
+  } catch(e) {
+    msg.textContent='확인 중 오류가 발생했어요'; msg.className='field-msg err';
   }
 }
 
+// 비밀번호 강도
+function checkPwStrength() {
+  const pw  = document.getElementById('signup-pw').value;
+  const msg = document.getElementById('pw-msg');
+  const bars = ['ps1','ps2','ps3','ps4'];
+  bars.forEach(id => { const el=document.getElementById(id); if(el) el.style.background='#eee'; });
+  if (!pw) { msg.textContent=''; return; }
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Za-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const colors = ['#e8380d','#ff9800','#ffc107','#2d7a00'];
+  const labels = ['매우 약함','약함','보통','강함'];
+  for (let i=0; i<score; i++) { const el=document.getElementById(bars[i]); if(el) el.style.background=colors[score-1]; }
+  msg.textContent='비밀번호 강도: '+(labels[score-1]||'');
+  msg.className = score >= 3 ? 'field-msg ok' : 'field-msg err';
+}
+
+// 비밀번호 일치 확인
+function checkPwMatch() {
+  const pw  = document.getElementById('signup-pw').value;
+  const pw2 = document.getElementById('signup-pw2').value;
+  const msg = document.getElementById('pw2-msg');
+  const inp = document.getElementById('signup-pw2');
+  if (!pw2) { msg.textContent=''; inp.className='auth-input'; return; }
+  if (pw === pw2) {
+    msg.textContent='✓ 비밀번호가 일치해요'; msg.className='field-msg ok'; inp.className='auth-input ok';
+  } else {
+    msg.textContent='비밀번호가 일치하지 않아요'; msg.className='field-msg err'; inp.className='auth-input err';
+  }
+}
+
+// 비밀번호 보기/숨기기
+function togglePw(id) {
+  const inp = document.getElementById(id);
+  if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// 전화번호 자동 하이픈
+function formatPhone() {
+  const inp = document.getElementById('signup-phone');
+  let val = inp.value.replace(/\D/g,'');
+  if (val.length <= 3) inp.value = val;
+  else if (val.length <= 7) inp.value = val.slice(0,3)+'-'+val.slice(3);
+  else inp.value = val.slice(0,3)+'-'+val.slice(3,7)+'-'+val.slice(7,11);
+}
+
+// 전체 동의 토글
+function toggleAllAgree() {
+  const all = document.getElementById('agree-all').checked;
+  ['agree-terms','agree-privacy','agree-marketing'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = all;
+  });
+}
+function checkAgree() {
+  const t = document.getElementById('agree-terms')?.checked;
+  const p = document.getElementById('agree-privacy')?.checked;
+  const m = document.getElementById('agree-marketing')?.checked;
+  const allEl = document.getElementById('agree-all');
+  if (allEl) allEl.checked = t && p && m;
+}
+
+// 약관 보기 모달
+let currentTermsId = '';
+function showTerms(type) {
+  currentTermsId = type;
+  const modal = document.getElementById('terms-modal');
+  const title = document.getElementById('terms-modal-title');
+  const body  = document.getElementById('terms-modal-content');
+  if (!modal || !title || !body) return;
+  if (type === 'terms') {
+    title.textContent = '이용약관';
+    body.innerHTML = '<p><strong>제1조 (목적)</strong></p><p>본 약관은 진천 자급자족 서비스 이용과 관련하여 권리, 의무 및 책임사항을 규정합니다.</p><br><p><strong>제2조 (서비스 이용)</strong></p><p>진천군 주민이라면 누구나 무료로 이용할 수 있습니다. 허위 정보 등록, 사기 거래 등 불법행위는 서비스 이용이 제한될 수 있습니다.</p><br><p><strong>제3조 (수수료)</strong></p><p>본 서비스는 거래 수수료를 받지 않습니다. 광고 수익으로 운영됩니다.</p><br><p><strong>제4조 (면책)</strong></p><p>서비스는 판매자와 구매자 간의 거래를 중개할 뿐이며, 거래의 안전성에 대한 책임을 지지 않습니다.</p>';
+  } else {
+    title.textContent = '개인정보 처리방침';
+    body.innerHTML = '<p><strong>1. 수집하는 개인정보</strong></p><p>이름, 이메일, 지역, 휴대폰 번호(선택)</p><br><p><strong>2. 수집 목적</strong></p><p>회원 식별, 거래 중개, 서비스 운영</p><br><p><strong>3. 보관 기간</strong></p><p>회원 탈퇴 시까지. 단, 관련 법령에 따라 일정 기간 보관할 수 있습니다.</p><br><p><strong>4. 제3자 제공</strong></p><p>법령에 의한 경우를 제외하고 개인정보를 제3자에게 제공하지 않습니다.</p><br><p><strong>5. 문의</strong></p><p>jincheonshop@gmail.com</p>';
+  }
+  modal.style.display = 'flex';
+}
+function agreeAndClose() {
+  if (currentTermsId === 'terms') { const el=document.getElementById('agree-terms'); if(el) el.checked=true; }
+  if (currentTermsId === 'privacy') { const el=document.getElementById('agree-privacy'); if(el) el.checked=true; }
+  checkAgree();
+  const modal = document.getElementById('terms-modal');
+  if (modal) modal.style.display='none';
+}
+
+// 회원가입 처리
+async function doSignup() {
+  const name   = document.getElementById('signup-name')?.value.trim();
+  const email  = document.getElementById('signup-email')?.value.trim();
+  const pw     = document.getElementById('signup-pw')?.value;
+  const pw2    = document.getElementById('signup-pw2')?.value;
+  const region = document.getElementById('signup-region')?.value;
+  const phone  = document.getElementById('signup-phone')?.value.trim();
+  const err    = document.getElementById('signup-error');
+  const btn    = document.querySelector('#s-signup .auth-btn');
+
+  const showErr = (msg) => { if (err) { err.textContent=msg; err.classList.add('show'); err.style.display='block'; } };
+  if (err) { err.classList.remove('show'); err.style.display='none'; }
+
+  if (!name || name.length < 2)      { showErr('이름을 2자 이상 입력해주세요'); return; }
+  if (!emailChecked)                  { showErr('이메일 중복 확인을 해주세요'); return; }
+  if (!pw || pw.length < 8)          { showErr('비밀번호는 8자 이상이어야 해요'); return; }
+  if (!/[A-Za-z]/.test(pw))          { showErr('비밀번호에 영문자를 포함해주세요'); return; }
+  if (!/[0-9]/.test(pw))             { showErr('비밀번호에 숫자를 포함해주세요'); return; }
+  if (pw !== pw2)                     { showErr('비밀번호가 일치하지 않아요'); return; }
+  if (!region)                        { showErr('거주 지역을 선택해주세요'); return; }
+  if (!document.getElementById('agree-terms')?.checked)   { showErr('이용약관에 동의해주세요'); return; }
+  if (!document.getElementById('agree-privacy')?.checked) { showErr('개인정보 처리방침에 동의해주세요'); return; }
+
+  if (btn) { btn._orig=btn.textContent; btn.textContent='처리 중...'; btn.disabled=true; btn.style.opacity='0.7'; }
+  try {
+    const API = typeof API_BASE !== 'undefined' ? API_BASE : 'https://jincheon-app-production.up.railway.app';
+    const res = await fetch(`${API}/api/users/signup`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, email, password:pw, phone, region})
+    });
+    const data = await res.json();
+    if (!res.ok) { showErr(data.detail||'오류가 발생했어요'); return; }
+    localStorage.setItem('jc_token', data.token);
+    localStorage.setItem('jc_user', JSON.stringify({name:data.name, region:data.region}));
+    const showFn = typeof show === 'function' ? show : window.show;
+    if (showFn) { showFn('s-main'); }
+    const loadFn = typeof loadProducts === 'function' ? loadProducts : window.loadProducts;
+    if (loadFn) loadFn();
+    const infoFn = typeof loadMyInfo === 'function' ? loadMyInfo : window.loadMyInfo;
+    if (infoFn) infoFn();
+    alert('가입 완료! 환영합니다 😊');
+  } catch(e) {
+    showErr('서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요.');
+  } finally {
+    if (btn) { btn.textContent=btn._orig||'가입하기'; btn.disabled=false; btn.style.opacity='1'; }
+  }
+}
+
+// 비밀번호 재설정
 async function doResetPw() {
   const name   = document.getElementById('findpw-name')?.value.trim();
   const email  = document.getElementById('findpw-email')?.value.trim();
@@ -703,25 +1009,112 @@ async function doResetPw() {
   const newPw  = document.getElementById('findpw-newpw')?.value;
   const err    = document.getElementById('findpw-error');
   const btn    = document.querySelector('#s-find-pw .auth-btn');
-  if (!name || !email || !region || !newPw) { err.textContent='모든 항목을 입력해주세요'; err.classList.add('show'); return; }
-  setLoading(btn, true);
+
+  const check = (cond, msg) => { 
+    if (cond) { 
+      if (err) { err.textContent = msg; err.classList.add("show"); err.style.display = 'block'; } 
+      return false; 
+    } 
+    return true; 
+  };
+
+  if (err) { err.classList.remove("show"); err.style.display = 'none'; }
+
+  if (!check(!name, "이름을 입력해주세요")) return;
+  if (!check(!email, "이메일을 입력해주세요")) return;
+  if (!check(!region, "지역을 선택해주세요")) return;
+  if (!check(!newPw || newPw.length < 8, "새 비밀번호는 8자 이상이어야 해요")) return;
+  if (!check(!/[A-Za-z]/.test(newPw) || !/[0-9]/.test(newPw), "새 비밀번호에 영문과 숫자를 포함해주세요")) return;
+
+  if (btn) { btn._orig=btn.textContent; btn.textContent='처리 중...'; btn.disabled=true; btn.style.opacity='0.7'; }
   try {
-    await UserAPI.resetPassword(email, name, region, newPw);
-    alert('비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.');
+    const API = typeof API_BASE !== 'undefined' ? API_BASE : 'https://jincheon-app-production.up.railway.app';
+    const res = await fetch(`${API}/api/users/reset-password`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, name, region, new_password: newPw })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || '오류가 발생했어요');
+
+    alert('비밀번호가 성공적으로 변경됐어요! 새 비밀번호로 로그인해 주세요 😊');
+    
+    // 폼 초기화 및 화면 이동
+    document.getElementById('findpw-name').value = '';
+    document.getElementById('findpw-email').value = '';
+    document.getElementById('findpw-region').value = '';
+    document.getElementById('findpw-newpw').value = '';
     show('s-login');
   } catch (e) {
-    err.textContent = e.message; err.classList.add('show');
+    if (err) { err.textContent = e.message; err.classList.add("show"); err.style.display = 'block'; }
   } finally {
-    setLoading(btn, false);
+    if (btn) { btn.textContent=btn._orig||'비밀번호 변경하기'; btn.disabled=false; btn.style.opacity='1'; }
   }
 }
 
-// ... other functions (signup, validate, etc.) ...
+// 화면 전환
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function ftog(el) { el.classList.toggle('on'); }
+function condSel(el) {
+  el.closest('.reg-chips').querySelectorAll('.reg-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+function dtog(el) { el.classList.toggle('on'); }
+document.querySelectorAll('.hd-cat').forEach(c => {
+  c.onclick = () => { document.querySelectorAll('.hd-cat').forEach(x => x.classList.remove('on')); c.classList.add('on'); };
+});
+
+// 로그인
+async function doLogin() {
+  const email = document.getElementById("login-email")?.value.trim();
+  const pw = document.getElementById("login-pw")?.value;
+  const err = document.getElementById("login-error");
+  const btn = document.querySelector("#s-login .auth-btn");
+
+  if (!email || !pw) {
+    if (err) { err.textContent = "이메일과 비밀번호를 입력해주세요"; err.classList.add("show"); }
+    return;
+  }
+
+  if (btn) { btn._orig=btn.textContent; btn.textContent='처리 중...'; btn.disabled=true; btn.style.opacity='0.7'; }
+  try {
+    await UserAPI.login(email, pw);
+    if (err) err.classList.remove("show");
+    await loadProducts();
+    loadMyInfo();
+    show("s-main");
+  } catch (e) {
+    if (err) { err.textContent = e.message; err.classList.add("show"); }
+  } finally {
+    if (btn) { btn.textContent=btn._orig||'로그인'; btn.disabled=false; btn.style.opacity='1'; }
+  }
+}
+
+function loadMyInfo() {
+  const user = JSON.parse(localStorage.getItem('jc_user') || '{"name":"홍길동","region":"덕산읍"}');
+  const n = document.getElementById('my-name-text');
+  const r = document.getElementById('my-region-text');
+  if (n) n.textContent = user.name || '홍길동';
+  if (r) r.textContent = user.region || '진천';
+}
+function payMethod(el) {
+  el.closest('.pay-method').querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const buyBtn = document.querySelector('.det-buy');
+  if (buyBtn) buyBtn.onclick = () => show('s-pay');
+  document.querySelectorAll('.bn').forEach(bn => {
+    if (bn.textContent.includes('나')) bn.onclick = () => { loadMyInfo(); show('s-my'); };
+  });
+  loadMyInfo();
+});
 </script>
 
 <script src="/app/api.js"></script>
 </body>
-</html>"""
-
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(index_content)
+</html>
