@@ -251,13 +251,13 @@ async function loadProducts(filter = {}, append = false) {
   if (!grid) return;
 
   // -------------------------------------------------------------
-  // ⭐ [새로 추가된 부분] 필터 화면에서 선택된 카테고리/상태 값 가져오기
+  // ⭐ [수정된 부분] 상단 카테고리 탭과 필터 상태 값 가져오기
   // -------------------------------------------------------------
-  // 1. 카테고리 (전체가 아닐 경우에만 값 가져오기)
-  const catEl = document.querySelector('.fil-section:nth-child(2) .fil-chip.on');
-  const categoryValue = catEl && catEl.textContent !== '전체' ? catEl.textContent.trim() : '';
+  // 1. 상단 탭(빨간 배경)에서 선택된 카테고리 글자 가져오기
+  const mainCatEl = document.querySelector('.hd-cat.on');
+  const categoryValue = mainCatEl && mainCatEl.textContent !== '전체' ? mainCatEl.textContent.trim() : '';
 
-  // 2. 상태 (새상품/중고 - 전체가 아닐 경우에만 값 가져오기)
+  // 2. 필터 화면에서 상태(새상품/중고) 값 가져오기
   const condEl = document.querySelector('.fil-section:nth-child(3) .fil-chip.on');
   const conditionValue = condEl && condEl.textContent !== '전체' ? condEl.textContent.trim() : '';
 
@@ -273,14 +273,13 @@ async function loadProducts(filter = {}, append = false) {
   }
 
   try {
-    // [기존 코드] 이제 currentFilter에 카테고리와 상태 값이 포함되어 params로 들어갑니다.
     const params = { ...currentFilter, ...filter, page: currentPage, limit: 20 };
     const res = await ProductAPI.list(params);
 
     if (!append) grid.innerHTML = "";
 
     if (res.items.length === 0 && !append) {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#aaa;font-size:14px">아직 등록된 상품이 없어요.<br>첫 번째 판매자가 되어보세요! 🌿</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#aaa;font-size:14px">해당하는 상품이 없어요. 🌿</div>`;
       return;
     }
 

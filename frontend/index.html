@@ -1065,7 +1065,13 @@ function condSel(el) {
 }
 function dtog(el) { el.classList.toggle('on'); }
 document.querySelectorAll('.hd-cat').forEach(c => {
-  c.onclick = () => { document.querySelectorAll('.hd-cat').forEach(x => x.classList.remove('on')); c.classList.add('on'); };
+  c.onclick = () => { 
+    document.querySelectorAll('.hd-cat').forEach(x => x.classList.remove('on')); 
+    c.classList.add('on'); 
+    
+    // ⭐ 방금 추가한 이 한 줄이 클릭 시 상품을 다시 불러옵니다!
+    if (typeof loadProducts === 'function') loadProducts();
+  };
 });
 
 // 로그인
