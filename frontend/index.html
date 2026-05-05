@@ -239,6 +239,45 @@ body { font-family: 'Malgun Gothic', sans-serif; background: #f7f7f7; max-width:
 .done-sub { font-size: 14px; color: #888; line-height: 1.7; margin-bottom: 32px; }
 .done-btn { width: 100%; background: #e8380d; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 10px; }
 .done-btn-outline { width: 100%; background: #fff; color: #e8380d; border: 1.5px solid #e8380d; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+/* ── 하단 로컬 및 애드센스 광고 영역 ── */
+.ad-slot { margin: 16px 14px 10px; }
+.ad-slot-empty {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  transition: background 0.2s;
+}
+.ad-slot-empty:active { background: #fafafa; }
+.ad-slot-empty-text { font-size: 14px; font-weight: 700; color: #333; }
+.ad-slot-empty-btn {
+  background: #fff0f0;
+  color: #e8380d;
+  border: 1px solid #ffd0d0;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.ad-adsense { margin: 10px 14px 30px; }
+.ad-adsense-placeholder {
+  background: #fafafa;
+  border: 1.5px dashed #ccc;
+  border-radius: 10px;
+  padding: 30px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+}
 </style>
 </head>
 <body>
@@ -1119,6 +1158,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   loadMyInfo();
 });
+
+// 광고 문의 팝업
+function showAdInquiry() {
+  alert("광고 문의는 jincheonshop@gmail.com 으로 연락주세요! 📢");
+}
 </script>
 
 <script src="/app/api.js"></script>
